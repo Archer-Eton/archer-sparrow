@@ -694,23 +694,23 @@
     padding: 13px 18px;
     cursor: pointer;
     box-shadow:
-      0 0 0 2.5px #e05555,
-      0 0 12px rgba(220,85,85,0.4),
-      0 0 24px rgba(220,85,85,0.2);
+      0 0 0 2.5px #0ea5e9,
+      0 0 12px rgba(56,189,248,0.4),
+      0 0 24px rgba(56,189,248,0.2);
     transition: box-shadow 0.3s ease;
     animation: watchPulse 2.5s ease-in-out infinite;
   }
 
   .watch-header:hover {
     box-shadow:
-      0 0 0 2.5px #ff6666,
-      0 0 20px rgba(255,100,100,0.6),
-      0 0 40px rgba(255,100,100,0.3);
+      0 0 0 2.5px #7dd3fc,
+      0 0 20px rgba(56,189,248,0.6),
+      0 0 40px rgba(56,189,248,0.3);
   }
 
   @keyframes watchPulse {
-    0%, 100% { box-shadow: 0 0 0 2.5px #e05555, 0 0 12px rgba(220,85,85,0.4), 0 0 24px rgba(220,85,85,0.2); }
-    50%       { box-shadow: 0 0 0 2.5px #ff6666, 0 0 20px rgba(255,100,100,0.6), 0 0 40px rgba(255,100,100,0.3); }
+    0%, 100% { box-shadow: 0 0 0 2.5px #0ea5e9, 0 0 12px rgba(56,189,248,0.4), 0 0 24px rgba(56,189,248,0.2); }
+    50%       { box-shadow: 0 0 0 2.5px #7dd3fc, 0 0 20px rgba(56,189,248,0.6), 0 0 40px rgba(56,189,248,0.3); }
   }
 
   .watch-title {
@@ -719,10 +719,10 @@
     gap: 8px;
     font-size: 14px;
     font-weight: 700;
-    color: #ff6b6b;
+    color: #38bdf8;
     letter-spacing: 2px;
     text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(255,100,100,0.5);
+    text-shadow: 0 0 10px rgba(56,189,248,0.5);
   }
 
   .watch-count {
@@ -736,7 +736,7 @@
     flex-direction: column;
     gap: 16px;
     background: var(--dark3);
-    border: 1px solid rgba(220,85,85,0.15);
+    border: 1px solid rgba(56,189,248,0.15);
     border-top: none;
     border-radius: 0 0 12px 12px;
     padding: 16px;
@@ -751,7 +751,7 @@
   .video-label {
     font-size: 10px;
     letter-spacing: 2px;
-    color: #ff6b6b;
+    color: #38bdf8;
     text-transform: uppercase;
   }
 
@@ -807,45 +807,11 @@
   </div>
 </div>
 
-<div class="watch-section">
-  <div class="watch-header" onclick="toggleWatch()">
-    <div class="watch-title">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="#ff6b6b"><path d="M8 5v14l11-7z"/></svg>
-      <span>Watch Videos</span>
-      <span class="watch-count">2 videos</span>
-    </div>
-    <svg class="chevron" id="watchChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-  </div>
-  <div class="watch-tracks" id="watchTracks">
-
-    <div class="video-item">
-      <div class="video-label">Walking With The Lord</div>
-      <div class="video-frame">
-        <iframe src="https://www.youtube.com/embed/YvUOq_tcEl4" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-      </div>
-    </div>
-
-    <div class="video-item">
-      <div class="video-label">Rough Road</div>
-      <div class="video-frame">
-        <iframe src="https://www.youtube.com/embed/sMDJYWObClA" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-      </div>
-    </div>
+    
 
   </div>
 </div>
 
-<div class="quick-actions">
-  <div class="quick-label">Ask me about</div>
-  <div class="quick-btns">
-    <button class="quick-btn" onclick="sendQuick('Tell me about Archer Man')">🎤 About Archer Man</button>
-    <button class="quick-btn" onclick="sendQuick('What is the story behind Them Are Plenty?')">🎵 Them Are Plenty</button>
-    <button class="quick-btn" onclick="sendQuick('Tell me the story behind Strange Love')">💛 Strange Love</button>
-    <button class="quick-btn" onclick="sendQuick('Recommend a song for when I am feeling reflective and thoughtful')">🎭 Song for my mood</button>
-    <button class="quick-btn" onclick="sendQuick('Show me streaming statistics')">📊 Streaming Stats</button>
-    <button class="quick-btn" onclick="sendQuick('What songs does Archer Man have?')">🎶 All Songs</button>
-  </div>
-</div>
 
 <div class="listen-section">
   <div class="listen-header" onclick="toggleListen()">
@@ -854,22 +820,10 @@
       <span>Listen Now</span>
       <span class="listen-count">9 tracks</span>
     </div>
-    <button id="muteBtn" onclick="toggleMute(event)" style="background:rgba(201,168,76,0.1); border:1px solid rgba(201,168,76,0.3); border-radius:100px; padding:4px 12px; color:var(--gold); font-size:11px; font-family:'Space Mono',monospace; cursor:pointer; margin-right:6px; transition:all 0.2s;" title="Toggle previews">🔊 Live</button>
     <svg class="chevron" id="listenChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
   </div>
   <div id="listenTracks" style="display:none; flex-direction:column; gap:14px; background:var(--dark3); border:1px solid rgba(201,168,76,0.12); border-top:none; border-radius:0 0 12px 12px; padding:12px 16px;">
 
-    <!-- Mute overlay -->
-    <div id="muteOverlay" style="display:none; flex-direction:column; align-items:center; justify-content:center; padding:32px 16px; gap:14px; text-align:center;">
-      <div style="font-size:40px;">🔇</div>
-      <div style="font-size:14px; color:var(--text); font-weight:700;">Previews are paused</div>
-      <div style="font-size:11px; color:var(--text-muted); letter-spacing:1px;">Purchase to download and listen to full songs</div>
-      <button onclick="showDownload()" style="background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(168,85,247,0.05)); border:2px solid #a855f7; color:#d8b4fe; padding:10px 24px; border-radius:100px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px; margin-top:4px;">⬇ Download Music</button>
-      <button onclick="toggleMute()" style="background:transparent; border:1px solid rgba(201,168,76,0.3); color:var(--gold); padding:7px 18px; border-radius:100px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px;">🔊 Unmute Previews</button>
-    </div>
-
-    <!-- Song players -->
-    <div id="songPlayers">
     <div class="platform-label">🎵 On Spotify</div>
 
     <div class="track-item">
@@ -922,8 +876,38 @@
     <div style="padding:10px 0 4px; text-align:center;">
       <button class="subscribe-yt-btn" onclick="goSubscribe()">▶ Subscribe</button>
     </div>
-    </div><!-- end songPlayers -->
+  </div>
+</div>
 
+
+<div class="watch-section">
+  <div class="watch-header" onclick="toggleWatch()">
+    <div class="watch-title">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#38bdf8"><path d="M8 5v14l11-7z"/></svg>
+      <span>Watch Videos</span>
+      <span class="watch-count">2 videos</span>
+    </div>
+    <svg class="chevron" id="watchChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+  <div class="watch-tracks" id="watchTracks">
+
+    <div class="video-item">
+      <div class="video-label">Walking With The Lord</div>
+      <div class="video-frame">
+        <iframe src="https://www.youtube.com/embed/YvUOq_tcEl4" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+
+
+<div class="quick-actions">
+  <div class="quick-label">Ask me about</div>
+  <div class="quick-btns">
+    <button class="quick-btn" onclick="sendQuick('Tell me about Archer Man')">🎤 About Archer Man</button>
+    <button class="quick-btn" onclick="sendQuick('What is the story behind Them Are Plenty?')">🎵 Them Are Plenty</button>
+    <button class="quick-btn" onclick="sendQuick('Tell me the story behind Strange Love')">💛 Strange Love</button>
+    <button class="quick-btn" onclick="sendQuick('Recommend a song for when I am feeling reflective and thoughtful')">🎭 Song for my mood</button>
+    <button class="quick-btn" onclick="sendQuick('Show me streaming statistics')">📊 Streaming Stats</button>
+    <button class="quick-btn" onclick="sendQuick('What songs does Archer Man have?')">🎶 All Songs</button>
   </div>
 </div>
 
@@ -954,7 +938,7 @@
   <div style="text-align:center; margin-bottom:10px;">
     <button class="share-show-btn" onclick="shareSparrow()">🔗 Share Sparrow</button>
   </div>
-  <div class="hint">Sparrow · Powered by Claude AI · Archer Man Official</div>
+  <div class="hint">Sparrow · Powered by Gemini AI · Archer Man Official</div>
 </div>
 
 <script>
@@ -1063,7 +1047,7 @@ const YT_CHANNEL = 'https://youtube.com/channel/UClpPzeXk32wAyZImXt0kfJQ?si=0iHd
 
 
 
-const SPARROW_URL = 'https://archer-sparrow.netlify.app';
+const SPARROW_URL = 'https://archer-sparrow.vercel.app';
 const SPARROW_MSG = "Chat with Sparrow — Archer Man's official AI music bot! Discover the stories behind his reggae music and listen to his songs 🎵 ";
 
 function shareSparrow() {
@@ -1171,32 +1155,6 @@ function initiatePayment() {
   handler.openIframe();
 }
 
-
-let isMuted = false;
-
-function toggleMute(event) {
-  if (event) event.stopPropagation();
-  isMuted = !isMuted;
-  const overlay = document.getElementById('muteOverlay');
-  const players = document.getElementById('songPlayers');
-  const btn = document.getElementById('muteBtn');
-
-  if (isMuted) {
-    overlay.style.display = 'flex';
-    players.style.display = 'none';
-    btn.innerHTML = '🔇 Muted';
-    btn.style.borderColor = 'rgba(255,100,100,0.5)';
-    btn.style.color = '#fca5a5';
-    btn.style.background = 'rgba(255,100,100,0.1)';
-  } else {
-    overlay.style.display = 'none';
-    players.style.display = 'block';
-    btn.innerHTML = '🔊 Live';
-    btn.style.borderColor = 'rgba(201,168,76,0.3)';
-    btn.style.color = 'var(--gold)';
-    btn.style.background = 'rgba(201,168,76,0.1)';
-  }
-}
 
 function goSubscribe() {
   window.open('https://youtube.com/channel/UClpPzeXk32wAyZImXt0kfJQ?si=0iHdxpARQ2IAZ8RK', '_blank');
@@ -1387,7 +1345,7 @@ async function sendMessage() {
     <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:18px;">Share Archer Man's music bot with friends</div>
 
     <div style="background:rgba(99,102,241,0.08); border:1px solid rgba(99,102,241,0.2); border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
-      <div style="font-size:11px; color:#a5b4fc; flex:1; word-break:break-all; text-align:left;">https://archer-sparrow.netlify.app</div>
+      <div style="font-size:11px; color:#a5b4fc; flex:1; word-break:break-all; text-align:left;">https://archer-sparrow.vercel.app</div>
       <button onclick="copyLink()" style="background:#6366f1; color:white; border:none; border-radius:6px; padding:6px 12px; font-size:10px; font-family:'Space Mono',monospace; cursor:pointer; white-space:nowrap;" id="copyBtn">Copy</button>
     </div>
 
