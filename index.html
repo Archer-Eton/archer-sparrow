@@ -841,7 +841,7 @@
 <div class="stats-bar">
   <div class="stats-inner">
     <div class="stat">
-      <div class="stat-num">9</div>
+      <div class="stat-num">10</div>
       <div class="stat-label">Songs Released</div>
     </div>
     <div class="stat-divider"></div>
@@ -1073,6 +1073,11 @@ Story: A song of gratitude to the Creator of the Universe, Who dispenses all ble
 Mood: Grateful, peaceful, surrendered, uplifting, deeply spiritual
 Theme: Gratitude to the Creator, divine blessings, God's equity and mercy, trust in the Almighty as the only true anchor in life
 
+10. NETWORK
+Story: This song reflects the advent of the technological revolution in communication and entertainment. Call service providers arrived to make communication easier — though with a fee. No more post office before you send your mail, no more TV before you can watch movies. Archer Man recalls finishing his recording at Gordiac Studio and asking about pressing vinyl records, only for the sound engineer to burst into laughter — telling him vinyls were old fashioned and that his songs would be sold on CDs! But then the irony of network issues crops in — you try to call and it does not go through, the man at the other end is speaking but cannot hear you. And then you see the big boys and girls with wireless devices all over their bodies, talking to themselves along the streets! Then the pretty ladies, with their idle conversations, talking about Network! Funny!
+Mood: Humorous, observational, social commentary, nostalgic, witty
+Theme: The technological revolution in communication and entertainment, the irony of network failures despite advancement, the humour of modern connected life
+
 == MUSIC VIDEOS ==
 Walking With The Lord: https://youtu.be/YvUOq_tcEl4
 Rough Road: https://youtu.be/sMDJYWObClA
@@ -1203,6 +1208,19 @@ function selectPlan(el, amount, plan) {
   if (sel) sel.style.display = plan === 1 ? 'block' : 'none';
 }
 
+const DOWNLOAD_LINKS = {
+  'Network': 'https://drive.google.com/uc?export=download&id=1UPLZhFKwVoMEKas6ACcsoK_XjBxlpaWO',
+  'Great Babylon': 'https://drive.google.com/uc?export=download&id=1zvUPY1H9b9VqEZ3NphHOa7i6aDK9V4mF',
+  'Hand From Above': 'https://drive.google.com/uc?export=download&id=1DdckclOCf2pXqGV9Sx-6z3FqSoVm4vPl',
+  'Let's Come Together': 'https://drive.google.com/uc?export=download&id=157TvTvJ3-elr08cW9ykUT6pMrpOGatTV',
+  'My Baby Brown': 'https://drive.google.com/uc?export=download&id=1DK-HBSfzy4MmsOzrojRxM4zMrjhrxn2Q',
+  'Rough Road': 'https://drive.google.com/uc?export=download&id=1ElfwwQV0aSc9IyF-0vVVcCy9_aXXLMXM',
+  'Strange Love': 'https://drive.google.com/uc?export=download&id=124VUdiVVoHzr6jdM7WaF7uIzUILYlGxx',
+  'Them Are Plenty': 'https://drive.google.com/uc?export=download&id=1C5P7f_vuVZ7AS-9GtCvNPZbpnts5dUT_',
+  'Walking With The Lord': 'https://drive.google.com/uc?export=download&id=1axjA3JlQ0e_e-SOTJ8GV_Ec-ZGskBUde',
+  'Woman': 'https://drive.google.com/uc?export=download&id=18AKxXp3zv1JRoSlGjOU24I1X4MBMI8DA',
+};
+
 function initiatePayment() {
   const email = document.getElementById('fanEmail').value.trim();
   const name = document.getElementById('fanName').value.trim();
@@ -1236,8 +1254,33 @@ function initiatePayment() {
       ]
     },
     callback: function(response) {
-      document.getElementById('downloadResult').style.display = 'block';
-      document.querySelector('.pay-btn').style.display = 'none';
+      const resultDiv = document.getElementById('downloadResult');
+      const payBtn = document.querySelector('.pay-btn');
+      payBtn.style.display = 'none';
+
+      // Build download links based on plan
+      let linksHtml = '';
+      if (selectedPlan === 1) {
+        // Single song
+        const song = document.getElementById('songSelect').value;
+        const url = DOWNLOAD_LINKS[song];
+        if (url) {
+          linksHtml = `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:10px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:12px; text-decoration:none; font-weight:700;">⬇ Download ${song}</a>`;
+        }
+      } else {
+        // All songs for bundle and full collection
+        linksHtml = Object.entries(DOWNLOAD_LINKS).map(([title, url]) =>
+          `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:8px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:11px; text-decoration:none; margin-bottom:6px;">⬇ ${title}</a>`
+        ).join('');
+      }
+
+      resultDiv.innerHTML = `
+        <div style="font-size:20px; margin-bottom:8px;">✅</div>
+        <div style="font-size:13px; color:#86efac; font-weight:700; margin-bottom:4px;">Payment Successful!</div>
+        <div style="font-size:11px; color:#7aaac8; margin-bottom:14px;">Tap any song below to download directly to your device</div>
+        ${linksHtml}
+      `;
+      resultDiv.style.display = 'block';
     },
     onClose: function() {}
   });
@@ -1481,7 +1524,7 @@ async function sendMessage() {
 
       <div class="price-card" onclick="selectPlan(this, 1800, 9)" id="plan3">
         <div class="price-amount">₦1,800</div>
-        <div class="price-desc">Full Collection — All 9 Songs</div>
+        <div class="price-desc">Full Collection — All 10 Songs</div>
       </div>
 
     </div>
@@ -1493,7 +1536,7 @@ async function sendMessage() {
 
     <button class="pay-btn" onclick="initiatePayment()">💳 Pay with Paystack</button>
 
-    <div id="downloadResult" style="display:none; margin-top:14px; background:rgba(0,180,0,0.1); border:1px solid #00b400; border-radius:10px; padding:14px; text-align:center;">
+    <div id="downloadResult" style="display:none; margin-top:14px; background:rgba(0,0,0,0.2); border:1px solid #a855f7; border-radius:10px; padding:14px; text-align:center; max-height:300px; overflow-y:auto;">
       <div style="font-size:20px; margin-bottom:6px;">✅</div>
       <div style="font-size:12px; color:#86efac; font-weight:700; margin-bottom:4px;">Payment Successful!</div>
       <div style="font-size:11px; color:#7aaac8;">Your download link will be sent to your email shortly by Archer Man.</div>
