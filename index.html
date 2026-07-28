@@ -149,11 +149,35 @@
     background: var(--dark3);
     border: 1px solid rgba(201,168,76,0.15);
     border-radius: 12px;
-    padding: 16px 20px;
+    padding: 16px 20px 12px;
     display: flex;
     gap: 0;
     justify-content: space-around;
     flex-wrap: wrap;
+  }
+
+  .stat-base {
+    width: 100%;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    margin-top: 12px;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-base-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .stat-base-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
   }
 
   .stat {
@@ -193,17 +217,27 @@
   }
 
   .quick-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-muted);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #38bdf8;
     text-transform: uppercase;
     margin-bottom: 10px;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(56,189,248,0.6), 0 0 20px rgba(56,189,248,0.3);
+    animation: labelGlow 2.5s ease-in-out infinite;
+  }
+
+  @keyframes labelGlow {
+    0%, 100% { text-shadow: 0 0 10px rgba(56,189,248,0.6), 0 0 20px rgba(56,189,248,0.3); }
+    50%       { text-shadow: 0 0 16px rgba(56,189,248,0.9), 0 0 32px rgba(56,189,248,0.5); }
   }
 
   .quick-btns {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: center;
   }
 
   .quick-btn {
@@ -771,6 +805,18 @@
     border: none;
     border-radius: 10px;
   }
+
+  .upcoming-btn {
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(56,189,248,0.05)) !important;
+    border-color: #38bdf8 !important;
+    color: #7dd3fc !important;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(56,189,248,0.2);
+  }
+  .upcoming-btn:hover {
+    background: rgba(56,189,248,0.25) !important;
+    box-shadow: 0 0 18px rgba(56,189,248,0.4) !important;
+  }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -796,13 +842,17 @@
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
-      <div class="stat-num">2000</div>
-      <div class="stat-label">Active Since</div>
+      <div class="stat-num">12</div>
+      <div class="stat-label">Upcoming</div>
     </div>
     <div class="stat-divider"></div>
     <div class="stat">
       <div class="stat-num">6+</div>
       <div class="stat-label">Platforms</div>
+    </div>
+    <div class="stat-base">
+      <span class="stat-base-label">Active Since</span>
+      <span class="stat-base-num">2000</span>
     </div>
   </div>
 </div>
@@ -822,6 +872,7 @@
     <button class="quick-btn" onclick="sendQuick('Recommend a song for when I am feeling reflective and thoughtful')">🎭 Song for my mood</button>
     <button class="quick-btn" onclick="sendQuick('Show me streaming statistics')">📊 Streaming Stats</button>
     <button class="quick-btn" onclick="sendQuick('What songs does Archer Man have?')">🎶 All Songs</button>
+    <button class="quick-btn upcoming-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
   </div>
 </div>
 
@@ -1019,6 +1070,23 @@ Theme: Gratitude to the Creator, divine blessings, God's equity and mercy, trust
 Walking With The Lord: https://youtu.be/YvUOq_tcEl4
 Rough Road: https://youtu.be/sMDJYWObClA
 When fans ask about music videos, share these links and mention they can also watch inside Sparrow by clicking Watch Videos.
+
+== UPCOMING SONGS ==
+Archer Man has 12 new songs in the making, coming soon:
+1. Rastaman
+2. Thanks And Praises
+3. Ride On
+4. Love Inspiration
+5. Ima
+6. I'm I Dreaming?
+7. Great Triangle
+8. Little Lover
+9. Music In My Soul
+10. Rasta Music
+11. Mbre Ikoso
+12. Nkere Uwem
+
+When fans ask about upcoming songs, list all 12 with excitement and encourage them to subscribe to Archer Man's YouTube channel and follow on Spotify so they don't miss the releases.
 
 == STREAMING STATISTICS ==
 Total streams: approximately 1,900 (1.9K)
