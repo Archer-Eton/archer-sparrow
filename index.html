@@ -158,13 +158,20 @@
 
   .stat-base {
     width: 100%;
-    border-top: 1px solid rgba(201,168,76,0.1);
-    margin-top: 12px;
-    padding-top: 10px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    height: 1px;
+    margin-top: 14px;
+    margin-bottom: 10px;
+    opacity: 0.6;
+  }
+
+  .stat-base-content {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
+    padding-bottom: 2px;
   }
 
   .stat-base-label {
@@ -847,7 +854,8 @@
       <div class="stat-num">6+</div>
       <div class="stat-label">Platforms</div>
     </div>
-    <div class="stat-base">
+    <div class="stat-base"></div>
+    <div class="stat-base-content">
       <span class="stat-base-label">Active Since</span>
       <span class="stat-base-num">2000</span>
     </div>
