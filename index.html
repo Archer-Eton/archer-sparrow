@@ -1242,7 +1242,7 @@ function initiatePayment() {
   }
 
   const handler = PaystackPop.setup({
-    key: 'pk_live_fe50b5b50b2b6b28802f3e980303133c3298cecc',
+    key: 'pk_test_1a9374031d721aeab50a4ccf7474e14d9b2c6c23',
     email: email,
     amount: selectedAmount * 100, // Paystack uses kobo
     currency: 'NGN',
@@ -1254,9 +1254,10 @@ function initiatePayment() {
       ]
     },
     callback: function(response) {
-      const resultDiv = document.getElementById('downloadResult');
-      const payBtn = document.querySelector('.pay-btn');
-      payBtn.style.display = 'none';
+      try {
+        const resultDiv = document.getElementById('downloadResult');
+        const payBtn = document.querySelector('.pay-btn');
+        if (payBtn) payBtn.style.display = 'none';
 
       // Build download links based on plan
       let linksHtml = '';
@@ -1277,12 +1278,20 @@ function initiatePayment() {
       resultDiv.innerHTML = `
         <div style="font-size:20px; margin-bottom:8px;">✅</div>
         <div style="font-size:13px; color:#86efac; font-weight:700; margin-bottom:4px;">Payment Successful!</div>
+        <div style="font-size:11px; color:#7aaac8; margin-bottom:8px;">Ref: ${response.reference}</div>
         <div style="font-size:11px; color:#7aaac8; margin-bottom:14px;">Tap any song below to download directly to your device</div>
         ${linksHtml}
       `;
-      resultDiv.style.display = 'block';
+        resultDiv.style.display = 'block';
+        // Scroll to show download links
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch(err) {
+        alert('Payment successful! Please screenshot this page. Your reference is: ' + response.reference);
+      }
     },
-    onClose: function() {}
+    onClose: function() {
+      // Remind fan if they closed without completing
+    }
   });
   handler.openIframe();
 }
