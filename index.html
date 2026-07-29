@@ -1208,6 +1208,17 @@ function selectPlan(el, amount, plan) {
   const sel = document.getElementById('songSelect');
   if (sel) sel.style.display = plan === 1 ? 'block' : 'none';
 
+  // Show 5-song checkbox selector for plan 5
+  const fiveSel = document.getElementById('fiveSongSelector');
+  if (fiveSel) {
+    fiveSel.style.display = plan === 5 ? 'block' : 'none';
+    if (plan === 5) {
+      // Uncheck all when switching to plan 5
+      document.querySelectorAll('.song-check').forEach(c => c.checked = false);
+      updateCheckCount();
+    }
+  }
+
   // Show bundle notice for plans 2 and 3
   const notice = document.getElementById('bundleNotice');
   if (notice) {
@@ -1262,6 +1273,14 @@ function initiatePayment() {
     }
   }
 
+  if (selectedPlan === 5) {
+    const checked = document.querySelectorAll('.song-check:checked');
+    if (checked.length !== 5) {
+      alert('Please select exactly 5 songs.');
+      return;
+    }
+  }
+
   const handler = PaystackPop.setup({
     key: 'pk_test_1a9374031d721aeab50a4ccf7474e14d9b2c6c23',
     email: email,
@@ -1289,8 +1308,15 @@ function initiatePayment() {
         if (url) {
           linksHtml = `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:10px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:12px; text-decoration:none; font-weight:700;">⬇ Download ${song}</a>`;
         }
+      } else if (selectedPlan === 5) {
+        // Deliver only the 5 selected songs
+        const chosen = Array.from(document.querySelectorAll('.song-check:checked')).map(c => c.value);
+        linksHtml = chosen.map(title => {
+          const url = DOWNLOAD_LINKS[title];
+          return url ? `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:8px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:11px; text-decoration:none; margin-bottom:6px;">⬇ ${title}</a>` : '';
+        }).join('');
       } else {
-        // All songs for bundle and full collection
+        // Full collection — all 10 songs
         linksHtml = Object.entries(DOWNLOAD_LINKS).map(([title, url]) =>
           `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:8px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:11px; text-decoration:none; margin-bottom:6px;">⬇ ${title}</a>`
         ).join('');
@@ -1317,6 +1343,18 @@ function initiatePayment() {
   handler.openIframe();
 }
 
+
+function updateCheckCount() {
+  const checked = document.querySelectorAll('.song-check:checked');
+  const count = checked.length;
+  const countEl = document.getElementById('checkCount');
+  if (countEl) countEl.innerHTML = `Select 5 songs (${count}/5 selected)`;
+
+  // Disable unchecked boxes once 5 selected
+  document.querySelectorAll('.song-check').forEach(cb => {
+    if (!cb.checked) cb.disabled = count >= 5;
+  });
+}
 
 function goSubscribe() {
   window.open('https://youtube.com/channel/UClpPzeXk32wAyZImXt0kfJQ?si=0iHdxpARQ2IAZ8RK', '_blank');
@@ -1551,7 +1589,22 @@ async function sendMessage() {
       <div class="price-card" onclick="selectPlan(this, 950, 5)" id="plan2">
         <div class="price-amount">₦950</div>
         <div class="price-desc">Any 5 Songs Bundle</div>
-        <div style="font-size:9px; color:#7aaac8; margin-top:4px; letter-spacing:1px;">All 10 download links delivered</div>
+        <div style="font-size:9px; color:#7aaac8; margin-top:4px; letter-spacing:1px;">Choose exactly 5 songs</div>
+        <div id="fiveSongSelector" style="display:none; margin-top:10px; text-align:left;">
+          <div style="font-size:10px; color:#a5b4fc; margin-bottom:6px; letter-spacing:1px;" id="checkCount">Select 5 songs (0/5 selected)</div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Network" onchange="updateCheckCount()"> Network</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Them Are Plenty" onchange="updateCheckCount()"> Them Are Plenty</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Strange Love" onchange="updateCheckCount()"> Strange Love</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Let's Come Together" onchange="updateCheckCount()"> Let's Come Together</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Rough Road" onchange="updateCheckCount()"> Rough Road</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Walking With The Lord" onchange="updateCheckCount()"> Walking With The Lord</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Great Babylon" onchange="updateCheckCount()"> Great Babylon</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Woman" onchange="updateCheckCount()"> Woman</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="My Baby Brown" onchange="updateCheckCount()"> My Baby Brown</label>
+            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Hand From Above" onchange="updateCheckCount()"> Hand From Above</label>
+          </div>
+        </div>
       </div>
 
       <div class="price-card" onclick="selectPlan(this, 1800, 9)" id="plan3">
