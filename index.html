@@ -821,6 +821,39 @@
     margin: 0 auto 16px;
     opacity: 0.5;
   }
+
+  .song-pick-btn {
+    background: rgba(0,49,83,0.6);
+    border: 1px solid rgba(168,85,247,0.3);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .song-pick-btn:active { transform: scale(0.98); }
+  .song-pick-btn.picked {
+    background: rgba(168,85,247,0.2);
+    border-color: #a855f7;
+    color: #d8b4fe;
+  }
+  .song-pick-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .pick-tick {
+    font-size: 16px;
+    font-weight: 700;
+    color: #a855f7;
+    min-width: 16px;
+  }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -1213,8 +1246,12 @@ function selectPlan(el, amount, plan) {
   if (fiveSel) {
     fiveSel.style.display = plan === 5 ? 'block' : 'none';
     if (plan === 5) {
-      // Uncheck all when switching to plan 5
-      document.querySelectorAll('.song-check').forEach(c => c.checked = false);
+      // Reset selections when switching to plan 5
+      selectedSongs = [];
+      document.querySelectorAll('.song-pick-btn').forEach(b => {
+        b.classList.remove('picked', 'disabled');
+        b.querySelector('.pick-tick').textContent = '○';
+      });
       updateCheckCount();
     }
   }
@@ -1274,8 +1311,7 @@ function initiatePayment() {
   }
 
   if (selectedPlan === 5) {
-    const checked = document.querySelectorAll('.song-check:checked');
-    if (checked.length !== 5) {
+    if (selectedSongs.length !== 5) {
       alert('Please select exactly 5 songs.');
       return;
     }
@@ -1310,7 +1346,7 @@ function initiatePayment() {
         }
       } else if (selectedPlan === 5) {
         // Deliver only the 5 selected songs
-        const chosen = Array.from(document.querySelectorAll('.song-check:checked')).map(c => c.value);
+        const chosen = selectedSongs.slice();
         linksHtml = chosen.map(title => {
           const url = DOWNLOAD_LINKS[title];
           return url ? `<a href="${url}" target="_blank" download style="display:block; background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:8px 14px; color:#d8b4fe; font-family:'Space Mono',monospace; font-size:11px; text-decoration:none; margin-bottom:6px;">⬇ ${title}</a>` : '';
@@ -1344,15 +1380,40 @@ function initiatePayment() {
 }
 
 
-function updateCheckCount() {
-  const checked = document.querySelectorAll('.song-check:checked');
-  const count = checked.length;
-  const countEl = document.getElementById('checkCount');
-  if (countEl) countEl.innerHTML = `Select 5 songs (${count}/5 selected)`;
+// Track selected songs for 5-song bundle
+let selectedSongs = [];
 
-  // Disable unchecked boxes once 5 selected
-  document.querySelectorAll('.song-check').forEach(cb => {
-    if (!cb.checked) cb.disabled = count >= 5;
+function toggleSongPick(el, song) {
+  const idx = selectedSongs.indexOf(song);
+  if (idx > -1) {
+    // Deselect
+    selectedSongs.splice(idx, 1);
+    el.classList.remove('picked');
+    el.querySelector('.pick-tick').textContent = '○';
+  } else {
+    if (selectedSongs.length >= 5) return; // Max 5
+    selectedSongs.push(song);
+    el.classList.add('picked');
+    el.querySelector('.pick-tick').textContent = '✓';
+  }
+  updateCheckCount();
+}
+
+function updateCheckCount() {
+  const count = selectedSongs.length;
+  const countEl = document.getElementById('checkCount');
+  if (countEl) {
+    countEl.innerHTML = count < 5
+      ? `Tap to select songs (${count}/5 selected)`
+      : `✓ 5 songs selected — fill details below and pay`;
+    countEl.style.color = count === 5 ? '#86efac' : '#a5b4fc';
+  }
+
+  // Disable unselected buttons once 5 chosen
+  document.querySelectorAll('.song-pick-btn').forEach(btn => {
+    if (!btn.classList.contains('picked')) {
+      btn.classList.toggle('disabled', count >= 5);
+    }
   });
 }
 
@@ -1592,17 +1653,17 @@ async function sendMessage() {
         <div style="font-size:9px; color:#7aaac8; margin-top:4px; letter-spacing:1px;">Choose exactly 5 songs</div>
         <div id="fiveSongSelector" style="display:none; margin-top:10px; text-align:left;">
           <div style="font-size:10px; color:#a5b4fc; margin-bottom:6px; letter-spacing:1px;" id="checkCount">Select 5 songs (0/5 selected)</div>
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Network" onchange="updateCheckCount()"> Network</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Them Are Plenty" onchange="updateCheckCount()"> Them Are Plenty</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Strange Love" onchange="updateCheckCount()"> Strange Love</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Let's Come Together" onchange="updateCheckCount()"> Let's Come Together</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Rough Road" onchange="updateCheckCount()"> Rough Road</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Walking With The Lord" onchange="updateCheckCount()"> Walking With The Lord</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Great Babylon" onchange="updateCheckCount()"> Great Babylon</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Woman" onchange="updateCheckCount()"> Woman</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="My Baby Brown" onchange="updateCheckCount()"> My Baby Brown</label>
-            <label style="font-size:11px; color:var(--text); display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" class="song-check" value="Hand From Above" onchange="updateCheckCount()"> Hand From Above</label>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+<div class="song-pick-btn" id="pick-0" onclick="toggleSongPick(this, 'Network')"><span class="pick-tick">○</span> Network</div>
+<div class="song-pick-btn" id="pick-1" onclick="toggleSongPick(this, 'Them Are Plenty')"><span class="pick-tick">○</span> Them Are Plenty</div>
+<div class="song-pick-btn" id="pick-2" onclick="toggleSongPick(this, 'Strange Love')"><span class="pick-tick">○</span> Strange Love</div>
+<div class="song-pick-btn" id="pick-3" onclick="toggleSongPick(this, 'Let's Come Together')"><span class="pick-tick">○</span> Let's Come Together</div>
+<div class="song-pick-btn" id="pick-4" onclick="toggleSongPick(this, 'Rough Road')"><span class="pick-tick">○</span> Rough Road</div>
+<div class="song-pick-btn" id="pick-5" onclick="toggleSongPick(this, 'Walking With The Lord')"><span class="pick-tick">○</span> Walking With The Lord</div>
+<div class="song-pick-btn" id="pick-6" onclick="toggleSongPick(this, 'Great Babylon')"><span class="pick-tick">○</span> Great Babylon</div>
+<div class="song-pick-btn" id="pick-7" onclick="toggleSongPick(this, 'Woman')"><span class="pick-tick">○</span> Woman</div>
+<div class="song-pick-btn" id="pick-8" onclick="toggleSongPick(this, 'My Baby Brown')"><span class="pick-tick">○</span> My Baby Brown</div>
+<div class="song-pick-btn" id="pick-9" onclick="toggleSongPick(this, 'Hand From Above')"><span class="pick-tick">○</span> Hand From Above</div>
           </div>
         </div>
       </div>
