@@ -1237,43 +1237,37 @@ function selectPlan(el, amount, plan) {
   selectedAmount = amount;
   selectedPlan = plan;
 
-  // Show song selector only for single song plan
-  const sel = document.getElementById('songSelect');
-  if (sel) sel.style.display = plan === 1 ? 'block' : 'none';
+  // Single song selector
+  const singleSel = document.getElementById('songSelect');
+  if (singleSel) singleSel.style.display = plan === 1 ? 'block' : 'none';
 
-  // Show 5-song checkbox selector for plan 5
+  // 5-song picker
   const fiveSel = document.getElementById('fiveSongSelector');
   if (fiveSel) {
     fiveSel.style.display = plan === 5 ? 'block' : 'none';
     if (plan === 5) {
-      // Reset selections when switching to plan 5
       selectedSongs = [];
       document.querySelectorAll('.song-pick-btn').forEach(b => {
-        b.classList.remove('picked', 'disabled');
-        b.querySelector('.pick-tick').textContent = '○';
+        b.classList.remove('picked','disabled');
+        b.querySelector('.pick-tick').innerHTML = '&#9675;';
       });
       updateCheckCount();
     }
   }
 
-  // Show bundle notice for plans 2 and 3
+  // Bundle notice only for full collection
   const notice = document.getElementById('bundleNotice');
   if (notice) {
-    if (plan !== 1) {
-      notice.style.display = 'block';
-      notice.innerHTML = plan === 5
-        ? '🎵 You will receive download links for all 10 songs. Fill in your name and email below then click Pay.'
-        : '🎵 You will receive all 10 song downloads. Fill in your name and email below then click Pay.';
-    } else {
-      notice.style.display = 'none';
-    }
+    notice.style.display = plan === 9 ? 'block' : 'none';
+    if (plan === 9) notice.innerHTML = '&#127925; All 10 download links will be delivered after payment.';
   }
 
-  // Update pay button text
+  // Pay button text
   const payBtn = document.querySelector('.pay-btn');
   if (payBtn) {
-    const labels = {1: '💳 Pay ₦200', 5: '💳 Pay ₦950 — Get All 10 Songs', 9: '💳 Pay ₦1,800 — Get All 10 Songs'};
-    payBtn.textContent = labels[plan] || '💳 Pay with Paystack';
+    if (plan === 1) payBtn.textContent = 'Pay ₦200';
+    else if (plan === 5) payBtn.textContent = 'Pay ₦950 — 5 Songs Bundle';
+    else payBtn.textContent = 'Pay ₦1,800 — Full Collection';
   }
 }
 
@@ -1630,54 +1624,61 @@ async function sendMessage() {
 
     <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
 
-      <div class="price-card selected" onclick="selectPlan(this, 200, 1)" id="plan1">
-        <div class="price-amount">₦200</div>
+      <!-- Plan 1: Single Song -->
+      <div class="price-card selected" onclick="selectPlan(this,200,1)" id="plan1">
+        <div class="price-amount">&#8358;200</div>
         <div class="price-desc">Single Song Download</div>
-        <select class="song-select" id="songSelect" style="display:block;">
-          <option value="">— Select a song —</option>
-          <option value="Network">Network</option>
-          <option value="Them Are Plenty">Them Are Plenty</option>
-          <option value="Strange Love">Strange Love</option>
-          <option value="Let's Come Together">Let's Come Together</option>
-          <option value="Rough Road">Rough Road</option>
-          <option value="Walking With The Lord">Walking With The Lord</option>
-          <option value="Great Babylon">Great Babylon</option>
-          <option value="Woman">Woman</option>
-          <option value="My Baby Brown">My Baby Brown</option>
-          <option value="Hand From Above">Hand From Above</option>
-        </select>
       </div>
 
-      <div class="price-card" onclick="selectPlan(this, 950, 5)" id="plan2">
-        <div class="price-amount">₦950</div>
+      <!-- Plan 2: 5 Songs -->
+      <div class="price-card" onclick="selectPlan(this,950,5)" id="plan2">
+        <div class="price-amount">&#8358;950</div>
         <div class="price-desc">Any 5 Songs Bundle</div>
-        <div style="font-size:9px; color:#7aaac8; margin-top:4px; letter-spacing:1px;">Choose exactly 5 songs</div>
-        <div id="fiveSongSelector" style="display:none; margin-top:10px; text-align:left;">
-          <div style="font-size:10px; color:#a5b4fc; margin-bottom:6px; letter-spacing:1px;" id="checkCount">Select 5 songs (0/5 selected)</div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-<div class="song-pick-btn" data-song="Network" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Network</div>
-<div class="song-pick-btn" data-song="Them Are Plenty" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Them Are Plenty</div>
-<div class="song-pick-btn" data-song="Strange Love" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Strange Love</div>
-<div class="song-pick-btn" data-song="Let's Come Together" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Let's Come Together</div>
-<div class="song-pick-btn" data-song="Rough Road" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Rough Road</div>
-<div class="song-pick-btn" data-song="Walking With The Lord" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Walking With The Lord</div>
-<div class="song-pick-btn" data-song="Great Babylon" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Great Babylon</div>
-<div class="song-pick-btn" data-song="Woman" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Woman</div>
-<div class="song-pick-btn" data-song="My Baby Brown" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> My Baby Brown</div>
-<div class="song-pick-btn" data-song="Hand From Above" onclick="toggleSongPick(this)"><span class="pick-tick">○</span> Hand From Above</div>
-          </div>
-        </div>
+        <div style="font-size:9px;color:#7aaac8;margin-top:4px;letter-spacing:1px;">Choose exactly 5 songs below</div>
       </div>
 
-      <div class="price-card" onclick="selectPlan(this, 1800, 9)" id="plan3">
-        <div class="price-amount">₦1,800</div>
-        <div class="price-desc">Full Collection — All 10 Songs</div>
-        <div style="font-size:9px; color:#7aaac8; margin-top:4px; letter-spacing:1px;">All 10 download links delivered</div>
+      <!-- Plan 3: Full Collection -->
+      <div class="price-card" onclick="selectPlan(this,1800,9)" id="plan3">
+        <div class="price-amount">&#8358;1,800</div>
+        <div class="price-desc">Full Collection &mdash; All 10 Songs</div>
+        <div style="font-size:9px;color:#7aaac8;margin-top:4px;letter-spacing:1px;">All 10 download links delivered</div>
       </div>
 
     </div>
 
-    <div id="bundleNotice" style="display:none; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:10px 14px; font-size:11px; color:#7dd3fc; text-align:center; margin-bottom:10px; letter-spacing:0.5px;"></div>
+    <!-- Single song selector -->
+    <select class="song-select" id="songSelect" style="display:block; background:rgba(0,49,83,0.8); border:1px solid rgba(168,85,247,0.3); color:#f0f4ff; border-radius:8px; padding:10px; width:100%; font-family:'Space Mono',monospace; font-size:12px; margin-bottom:10px;">
+      <option value="">&#8212; Select a song &#8212;</option>
+      <option value="Network">Network</option>
+      <option value="Them Are Plenty">Them Are Plenty</option>
+      <option value="Strange Love">Strange Love</option>
+      <option value="Let's Come Together">Let's Come Together</option>
+      <option value="Rough Road">Rough Road</option>
+      <option value="Walking With The Lord">Walking With The Lord</option>
+      <option value="Great Babylon">Great Babylon</option>
+      <option value="Woman">Woman</option>
+      <option value="My Baby Brown">My Baby Brown</option>
+      <option value="Hand From Above">Hand From Above</option>
+    </select>
+
+    <!-- 5-song picker (outside price cards so clicks don't bubble) -->
+    <div id="fiveSongSelector" style="display:none; margin-bottom:10px;">
+      <div id="checkCount" style="font-size:10px;color:#a5b4fc;margin-bottom:8px;letter-spacing:1px;text-align:center;">Tap to choose 5 songs (0/5)</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="song-pick-btn" data-song="Network" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Network</div>
+        <div class="song-pick-btn" data-song="Them Are Plenty" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Them Are Plenty</div>
+        <div class="song-pick-btn" data-song="Strange Love" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Strange Love</div>
+        <div class="song-pick-btn" data-song="Let's Come Together" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Let's Come Together</div>
+        <div class="song-pick-btn" data-song="Rough Road" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Rough Road</div>
+        <div class="song-pick-btn" data-song="Walking With The Lord" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Walking With The Lord</div>
+        <div class="song-pick-btn" data-song="Great Babylon" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Great Babylon</div>
+        <div class="song-pick-btn" data-song="Woman" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Woman</div>
+        <div class="song-pick-btn" data-song="My Baby Brown" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> My Baby Brown</div>
+        <div class="song-pick-btn" data-song="Hand From Above" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Hand From Above</div>
+      </div>
+    </div>
+
+<div id="bundleNotice" style="display:none; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:10px 14px; font-size:11px; color:#7dd3fc; text-align:center; margin-bottom:10px; letter-spacing:0.5px;"></div>
 
     <div id="fanEmailBox">
       <input id="fanEmail" type="email" placeholder="Your email address" style="background:rgba(0,49,83,0.8); border:1px solid rgba(168,85,247,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; width:100%; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box; margin-bottom:10px;">
