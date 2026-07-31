@@ -12,7 +12,7 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sparrow — Archer Man Official Bot</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --gold: #c9a84c;
@@ -861,6 +861,15 @@
     color: #a855f7;
     min-width: 16px;
   }
+
+  .motto-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #c084fc;
+    text-shadow: 0 0 10px rgba(192,132,252,0.5);
+    letter-spacing: 0.5px;
+  }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -896,8 +905,7 @@
     </div>
     <div class="stat-base"></div>
     <div class="stat-base-content">
-      <span class="stat-base-label">Active Since</span>
-      <span class="stat-base-num">2000</span>
+      <span class="motto-text">Peace and Love to All Mankind</span>
     </div>
   </div>
 </div>
@@ -1369,7 +1377,8 @@ function initiatePayment() {
         resultDiv.innerHTML = `
           <div style="font-size:20px;margin-bottom:8px;">&#9989;</div>
           <div style="font-size:13px;color:#86efac;font-weight:700;margin-bottom:4px;">Payment Successful!</div>
-          <div style="font-size:11px;color:#7aaac8;margin-bottom:14px;">Tap any song below to download</div>
+          <div style="font-size:12px;color:#d8b4fe;font-weight:700;margin-bottom:4px;">&#127881; Thank you for supporting Archer Man!</div>
+          <div style="font-size:11px;color:#7aaac8;margin-bottom:14px;">Your love keeps the music alive. Tap any song below to download.</div>
           ${linksHtml}
         `;
         resultDiv.style.display = 'block';
@@ -1410,7 +1419,7 @@ function updateCheckCount() {
   if (countEl) {
     countEl.innerHTML = count < 5
       ? `Tap to select songs (${count}/5 selected)`
-      : `✓ 5 songs selected — fill details below and pay`;
+      : `✓ 5 songs selected — Please pay to download`;
     countEl.style.color = count === 5 ? '#86efac' : '#a5b4fc';
   }
 
