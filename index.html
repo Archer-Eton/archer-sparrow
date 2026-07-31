@@ -901,6 +901,43 @@
     text-shadow: 0 0 10px rgba(212,245,66,0.5);
     letter-spacing: 0.5px;
   }
+
+  .intro-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: rgba(201,168,76,0.04);
+  }
+  .intro-row:hover { background: rgba(201,168,76,0.1); }
+  .intro-row.playing {
+    background: rgba(201,168,76,0.18);
+    border: 1px solid rgba(201,168,76,0.4);
+  }
+  .intro-play-icon {
+    font-size: 13px;
+    color: var(--gold);
+    width: 18px;
+    text-align: center;
+  }
+  .intro-title {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+  }
+  .intro-wave {
+    color: var(--gold);
+    font-size: 14px;
+    animation: waveBounce 1s infinite ease-in-out;
+  }
+  @keyframes waveBounce {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -977,63 +1014,86 @@
     </div>
     <svg class="chevron" id="listenChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
   </div>
-  <div id="listenTracks" style="display:none; flex-direction:column; gap:14px; background:var(--dark3); border:1px solid rgba(201,168,76,0.12); border-top:none; border-radius:0 0 12px 12px; padding:12px 16px;">
+  <div id="listenTracks" style="display:none; flex-direction:column; gap:6px; background:var(--dark3); border:1px solid rgba(201,168,76,0.12); border-top:none; border-radius:0 0 12px 12px; padding:12px 16px;">
 
-    <div class="platform-label">🎵 On Spotify</div>
+    <div class="platform-label">&#127925; Tap a title to preview</div>
 
-    <div class="track-item">
-      <div class="track-label">Them Are Plenty</div>
-      <iframe style="border-radius:8px" src="https://open.spotify.com/embed/track/3H5YW5yb3XkDKXbb8e9keJ?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <div class="intro-row" data-song="Network" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Network</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Them Are Plenty" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Them Are Plenty</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Strange Love" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Strange Love</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Let&#39;s Come Together" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Let's Come Together</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Rough Road" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Rough Road</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Walking With The Lord" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Walking With The Lord</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Great Babylon" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Great Babylon</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Woman" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Woman</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="My Baby Brown" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">My Baby Brown</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
+    </div>
+    <div class="intro-row" data-song="Hand From Above" onclick="playIntro(this)">
+      <span class="intro-play-icon">&#9658;</span>
+      <span class="intro-title">Hand From Above</span>
+      <span class="intro-wave" style="display:none;">&#9834;</span>
     </div>
 
-    <div class="track-item">
-      <div class="track-label">Great Babylon</div>
-      <iframe style="border-radius:8px" src="https://open.spotify.com/embed/track/27rQQVmURkKZ8bnBJnWDKI?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
+    <audio id="introPlayer" preload="none"></audio>
 
-    <div class="track-item">
-      <div class="track-label">Strange Love</div>
-      <iframe style="border-radius:8px" src="https://open.spotify.com/embed/track/0NcEp0trcnhRbJbEpxUmST?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-
-    <div class="track-item">
-      <div class="track-label">Let's Come Together</div>
-      <iframe style="border-radius:8px" src="https://open.spotify.com/embed/track/6PD6yh6duNx1RJdis5TATB?utm_source=generator&theme=0" width="100%" height="80" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-    </div>
-
-    <div class="platform-label">▶️ On YouTube</div>
-
-    <div class="track-item">
-      <div class="track-label">Walking With The Lord</div>
-      <iframe style="border-radius:8px" src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_kqOPCYn4yqJAKDQnS0J0PgGjIiYOP2yb8" width="100%" height="100" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-    </div>
-
-    <div class="track-item">
-      <div class="track-label">My Baby Brown</div>
-      <iframe style="border-radius:8px" src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_mYX5ZRWlqVqxQKHxH91hlltgkz0WwlAdE" width="100%" height="100" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-    </div>
-
-    <div class="track-item">
-      <div class="track-label">Rough Road</div>
-      <iframe style="border-radius:8px" src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_nAssixVs4OJniaOxFprmp0-eB7V44BJPU" width="100%" height="100" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-    </div>
-
-    <div class="track-item">
-      <div class="track-label">Woman</div>
-      <iframe style="border-radius:8px" src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_mcynbL3_XJ-G0mXYUKHn0C03SeI8lSWWw" width="100%" height="100" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
-    </div>
-
-    <div class="track-item">
-      <div class="track-label">Hand From Above</div>
-      <iframe style="border-radius:8px" src="https://www.youtube.com/embed/videoseries?list=OLAK5uy_mp3vGsacrizmi5WO2nwA_O33cwjXtXq-M" width="100%" height="100" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    <div style="padding:14px 0 4px; text-align:center;">
+      <div style="font-size:10px; color:var(--text-muted); letter-spacing:1px; margin-bottom:10px;">STREAM THE FULL SONGS</div>
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <a href="https://open.spotify.com/artist/5umBGZTUbaXAgJEUKDHZP2" target="_blank" style="text-decoration:none;">
+          <span style="display:inline-block; background:rgba(29,185,84,0.15); border:1px solid #1DB954; color:#1DB954; padding:7px 16px; border-radius:100px; font-size:11px; font-family:'Space Mono',monospace; font-weight:700;">Spotify</span>
+        </a>
+        <a href="https://music.apple.com" target="_blank" style="text-decoration:none;">
+          <span style="display:inline-block; background:rgba(250,60,80,0.15); border:1px solid #FA3C50; color:#FA3C50; padding:7px 16px; border-radius:100px; font-size:11px; font-family:'Space Mono',monospace; font-weight:700;">Apple Music</span>
+        </a>
+        <a href="https://music.youtube.com" target="_blank" style="text-decoration:none;">
+          <span style="display:inline-block; background:rgba(255,0,0,0.15); border:1px solid #FF0000; color:#FF6666; padding:7px 16px; border-radius:100px; font-size:11px; font-family:'Space Mono',monospace; font-weight:700;">YouTube Music</span>
+        </a>
+        <a href="https://music.amazon.com" target="_blank" style="text-decoration:none;">
+          <span style="display:inline-block; background:rgba(0,168,225,0.15); border:1px solid #00A8E1; color:#00A8E1; padding:7px 16px; border-radius:100px; font-size:11px; font-family:'Space Mono',monospace; font-weight:700;">Amazon Music</span>
+        </a>
+      </div>
     </div>
 
     <div style="padding:10px 0 4px; text-align:center;">
-      <button class="subscribe-yt-btn" onclick="goSubscribe()">▶ Subscribe</button>
+      <button class="subscribe-yt-btn" onclick="goSubscribe()">&#9658; Subscribe</button>
     </div>
-  </div>
-</div>
 
+  </div>
 
 <div class="watch-section">
   <div class="watch-header" onclick="toggleWatch()">
@@ -1538,13 +1598,80 @@ function updateMusicBtn() {
 
 window.addEventListener('DOMContentLoaded', initThemeMusic);
 
+const INTRO_LINKS = {
+  'Network': 'https://drive.google.com/uc?export=download&id=1XR8R9JGJTSv-XagcPraLcXOy7uKSqUC7',
+  'Them Are Plenty': 'https://drive.google.com/uc?export=download&id=1WogRydLhirSoWmY9Uyk55aueWBKrWQSp',
+  'Strange Love': 'https://drive.google.com/uc?export=download&id=1e3z_fcnZ0HKzpdVx3rYbIFYU2givNZCn',
+  'Let\'s Come Together': 'https://drive.google.com/uc?export=download&id=1ToPCtBZ07nJa-TNoYCmGNzeL2I3-n_ZD',
+  'Rough Road': 'https://drive.google.com/uc?export=download&id=18xxfui3br7bBGmg76QupImxci_HEXlRx',
+  'Walking With The Lord': 'https://drive.google.com/uc?export=download&id=1i4H716le27wPeRt8yrzd35qjNT6sJYQF',
+  'Great Babylon': 'https://drive.google.com/uc?export=download&id=18rrYqwFEYrvD2JcnDTGAuufo_cYyiRlj',
+  'Woman': 'https://drive.google.com/uc?export=download&id=1lbTAs1ft-1j5RZhIxtGUkURgvE4B0hac',
+  'My Baby Brown': 'https://drive.google.com/uc?export=download&id=17qFxvFSw1G6AfKUW1nu8fjZ02Q9Imvm1',
+  'Hand From Above': 'https://drive.google.com/uc?export=download&id=1eixYkdbs0TnB7Z4EOuUBhW39TvHw_SGD',
+};
+
+let currentIntroRow = null;
+
+function playIntro(rowEl) {
+  const player = document.getElementById('introPlayer');
+  const song = rowEl.getAttribute('data-song');
+  const url = INTRO_LINKS[song];
+  if (!url) return;
+
+  // If tapping the currently playing row, toggle pause/play
+  if (currentIntroRow === rowEl && !player.paused) {
+    player.pause();
+    rowEl.classList.remove('playing');
+    rowEl.querySelector('.intro-play-icon').innerHTML = '&#9658;';
+    rowEl.querySelector('.intro-wave').style.display = 'none';
+    return;
+  }
+
+  // Reset previous row
+  if (currentIntroRow && currentIntroRow !== rowEl) {
+    currentIntroRow.classList.remove('playing');
+    currentIntroRow.querySelector('.intro-play-icon').innerHTML = '&#9658;';
+    currentIntroRow.querySelector('.intro-wave').style.display = 'none';
+  }
+
+  player.src = url;
+  player.play().catch(() => {});
+  rowEl.classList.add('playing');
+  rowEl.querySelector('.intro-play-icon').innerHTML = '&#10074;&#10074;';
+  rowEl.querySelector('.intro-wave').style.display = 'inline';
+  currentIntroRow = rowEl;
+
+  pauseThemeMusic();
+
+  player.onended = () => {
+    rowEl.classList.remove('playing');
+    rowEl.querySelector('.intro-play-icon').innerHTML = '&#9658;';
+    rowEl.querySelector('.intro-wave').style.display = 'none';
+    currentIntroRow = null;
+    resumeThemeMusic();
+  };
+}
+
 function toggleListen() {
   const tracks = document.getElementById('listenTracks');
   const chevron = document.getElementById('listenChevron');
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
-  if (!isOpen) { pauseThemeMusic(); } else { resumeThemeMusic(); }
+  if (!isOpen) {
+    pauseThemeMusic();
+  } else {
+    const player = document.getElementById('introPlayer');
+    if (player) player.pause();
+    if (currentIntroRow) {
+      currentIntroRow.classList.remove('playing');
+      currentIntroRow.querySelector('.intro-play-icon').innerHTML = '&#9658;';
+      currentIntroRow.querySelector('.intro-wave').style.display = 'none';
+      currentIntroRow = null;
+    }
+    resumeThemeMusic();
+  }
 }
 
 let conversationHistory = [];
