@@ -874,6 +874,12 @@
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
+<audio id="themeSong" loop preload="auto">
+  <source src="https://drive.google.com/uc?export=download&id=1C5P7f_vuVZ7AS-9GtCvNPZbpnts5dUT_" type="audio/mpeg">
+</audio>
+
+<button id="musicToggleBtn" onclick="toggleThemeMusic()" style="position:fixed; top:14px; right:14px; z-index:500; background:rgba(0,49,83,0.85); border:1.5px solid var(--gold); border-radius:50%; width:42px; height:42px; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 0 12px rgba(201,168,76,0.4); font-size:18px;">&#127925;</button>
+
 
 <div class="header">
   <div class="artist-badge"><div class="dot"></div> Sparrow — Official Agent</div>
@@ -1442,7 +1448,64 @@ function toggleWatch() {
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
+  if (!isOpen) { pauseThemeMusic(); } else { resumeThemeMusic(); }
 }
+
+
+// ── Theme Song Control ──────────────────────────────────────────────────────
+const themeSong = document.getElementById('themeSong');
+let themeMuted = true;
+let themeUserPaused = false;
+
+function initThemeMusic() {
+  if (!themeSong) return;
+  themeSong.volume = 0.35;
+  themeSong.muted = true;
+  themeSong.play().catch(() => {});
+
+  const unmuteOnFirstTap = () => {
+    if (!themeUserPaused) {
+      themeSong.muted = false;
+      themeMuted = false;
+      themeSong.play().catch(() => {});
+      updateMusicBtn();
+    }
+    document.removeEventListener('click', unmuteOnFirstTap);
+    document.removeEventListener('touchstart', unmuteOnFirstTap);
+  };
+  document.addEventListener('click', unmuteOnFirstTap);
+  document.addEventListener('touchstart', unmuteOnFirstTap);
+}
+
+function pauseThemeMusic() {
+  if (themeSong && !themeSong.paused) themeSong.pause();
+}
+
+function resumeThemeMusic() {
+  if (themeSong && !themeUserPaused) themeSong.play().catch(() => {});
+}
+
+function toggleThemeMusic() {
+  if (!themeSong) return;
+  if (themeSong.paused) {
+    themeUserPaused = false;
+    themeSong.muted = false;
+    themeMuted = false;
+    themeSong.play().catch(() => {});
+  } else {
+    themeUserPaused = true;
+    themeSong.pause();
+  }
+  updateMusicBtn();
+}
+
+function updateMusicBtn() {
+  const btn = document.getElementById('musicToggleBtn');
+  if (!btn) return;
+  btn.innerHTML = (themeSong && !themeSong.paused) ? '&#127925;' : '&#128263;';
+}
+
+window.addEventListener('DOMContentLoaded', initThemeMusic);
 
 function toggleListen() {
   const tracks = document.getElementById('listenTracks');
@@ -1450,6 +1513,7 @@ function toggleListen() {
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
+  if (!isOpen) { pauseThemeMusic(); } else { resumeThemeMusic(); }
 }
 
 let conversationHistory = [];
