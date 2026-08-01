@@ -1760,6 +1760,27 @@ function hideTyping() {
   if (sendSparrow) sendSparrow.style.opacity = '1';
 }
 
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return response;
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
+}
+
+async function callSparrowBackend(payload, timeoutMs) {
+  return fetchWithTimeout('https://sparrow-backend-0mgf.onrender.com/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }, timeoutMs);
+}
+
 async function sendMessage() {
   if (isLoading) return;
   const input = document.getElementById('userInput');
@@ -1777,19 +1798,34 @@ async function sendMessage() {
   resetClearTimer();
   showTyping();
 
-  try {
-    const response = await fetch('https://sparrow-backend-0mgf.onrender.com/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: text,
-        history: conversationHistory.slice(0, -1).map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          content: m.content
-        }))
-      })
-    });
+  const payload = {
+    message: text,
+    history: conversationHistory.slice(0, -1).map(m => ({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      content: m.content
+    }))
+  };
 
+  let wakeupNoticeTimer = setTimeout(() => {
+    const bubble = document.querySelector('#typing-indicator .typing');
+    if (bubble) {
+      const note = document.createElement('div');
+      note.style.cssText = 'font-size:10px;color:var(--text-muted);margin-top:4px;';
+      note.textContent = 'Sparrow is waking up, just a moment...';
+      bubble.appendChild(note);
+    }
+  }, 6000);
+
+  try {
+    let response;
+    try {
+      response = await callSparrowBackend(payload, 20000);
+    } catch (firstErr) {
+      // First attempt timed out or failed — likely backend waking up. Retry with longer patience.
+      response = await callSparrowBackend(payload, 45000);
+    }
+
+    clearTimeout(wakeupNoticeTimer);
     const data = await response.json();
     const reply = data.reply || "I'm having trouble connecting right now. Please try again!";
 
@@ -1798,8 +1834,9 @@ async function sendMessage() {
     conversationHistory.push({ role: 'assistant', content: reply });
 
   } catch (err) {
+    clearTimeout(wakeupNoticeTimer);
     hideTyping();
-    addMessage('bot', "Hmm, there was a connection issue. Please try again in a moment.");
+    addMessage('bot', "Sparrow is taking a bit longer than usual to wake up. Please try sending your message again in a few seconds.");
   }
 
   isLoading = false;
