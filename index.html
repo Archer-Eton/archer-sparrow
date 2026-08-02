@@ -949,14 +949,26 @@
     color: var(--text);
     font-family: 'Space Mono', monospace;
   }
-  .intro-wave {
-    color: var(--gold);
-    font-size: 14px;
-    animation: waveBounce 1s infinite ease-in-out;
+  .wave-bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
   }
-  @keyframes waveBounce {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
+  .wave-bars span {
+    display: inline-block;
+    width: 3px;
+    background: var(--gold);
+    border-radius: 2px;
+    animation: waveBar 0.9s ease-in-out infinite;
+  }
+  .wave-bars span:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .wave-bars span:nth-child(2) { height: 90%; animation-delay: 0.15s; }
+  .wave-bars span:nth-child(3) { height: 60%; animation-delay: 0.3s; }
+  .wave-bars span:nth-child(4) { height: 100%; animation-delay: 0.45s; }
+  @keyframes waveBar {
+    0%, 100% { transform: scaleY(0.35); }
+    50% { transform: scaleY(1); }
   }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -1017,7 +1029,7 @@
     <div class="listen-title" style="flex:1; justify-content:center; text-align:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
       <span>Listen Now</span>
-      <span id="listenWaveIcon" style="display:none; margin-left:6px; color:var(--gold); animation:waveBounce 1s infinite ease-in-out;">&#9834;</span>
+      <span id="listenWaveIcon" class="wave-bars" style="display:none; margin-left:6px;"><span></span><span></span><span></span><span></span></span>
     </div>
     <svg class="chevron" id="listenChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
   </div>
@@ -1028,52 +1040,52 @@
     <div class="intro-row" data-song="Network" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Network</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Them Are Plenty" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Them Are Plenty</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Strange Love" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Strange Love</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Let&#39;s Come Together" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Let's Come Together</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Rough Road" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Rough Road</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Walking With The Lord" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Walking With The Lord</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Great Babylon" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Great Babylon</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Woman" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Woman</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="My Baby Brown" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">My Baby Brown</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
     <div class="intro-row" data-song="Hand From Above" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
       <span class="intro-title">Hand From Above</span>
-      <span class="intro-wave" style="display:none;">&#9834;</span>
+      <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
 
     <audio id="introPlayer" preload="none"></audio>
