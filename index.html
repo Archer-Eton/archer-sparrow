@@ -1575,6 +1575,35 @@ const INTRO_LINKS = {
 
 let currentIntroRow = null;
 
+// Suppress the browser's automatic floating media mini-player / lock-screen
+// controls, which can otherwise pop up and interrupt preview playback.
+function suppressMediaSession() {
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = null;
+      ['play', 'pause', 'stop', 'seekbackward', 'seekforward', 'previoustrack', 'nexttrack'].forEach(action => {
+        try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
+      });
+      navigator.mediaSession.playbackState = 'none';
+    } catch (e) {}
+  }
+}
+
+function stopCurrentIntro() {
+  const player = document.getElementById('introPlayer');
+  if (player && !player.paused) player.pause();
+  if (currentIntroRow) {
+    currentIntroRow.classList.remove('playing');
+    const icon = currentIntroRow.querySelector('.intro-play-icon');
+    if (icon) icon.innerHTML = '&#9658;';
+    const wave = currentIntroRow.querySelector('.intro-wave');
+    if (wave) wave.style.display = 'none';
+    currentIntroRow = null;
+  }
+  const waveIcon = document.getElementById('listenWaveIcon');
+  if (waveIcon) waveIcon.style.display = 'none';
+}
+
 function playIntro(rowEl) {
   const player = document.getElementById('introPlayer');
   const song = rowEl.getAttribute('data-song');
@@ -1585,23 +1614,19 @@ function playIntro(rowEl) {
 
   // If tapping the currently playing row, toggle pause/play
   if (currentIntroRow === rowEl && !player.paused) {
-    player.pause();
-    rowEl.classList.remove('playing');
-    rowEl.querySelector('.intro-play-icon').innerHTML = '&#9658;';
-    rowEl.querySelector('.intro-wave').style.display = 'none';
-    if (waveIcon) waveIcon.style.display = 'none';
+    stopCurrentIntro();
     return;
   }
 
-  // Reset previous row
+  // Reset previous row before starting a new one
   if (currentIntroRow && currentIntroRow !== rowEl) {
-    currentIntroRow.classList.remove('playing');
-    currentIntroRow.querySelector('.intro-play-icon').innerHTML = '&#9658;';
-    currentIntroRow.querySelector('.intro-wave').style.display = 'none';
+    stopCurrentIntro();
   }
 
   player.src = url;
   player.play().catch(() => {});
+  suppressMediaSession();
+
   rowEl.classList.add('playing');
   rowEl.querySelector('.intro-play-icon').innerHTML = '&#10074;&#10074;';
   rowEl.querySelector('.intro-wave').style.display = 'inline';
@@ -1609,11 +1634,7 @@ function playIntro(rowEl) {
   currentIntroRow = rowEl;
 
   player.onended = () => {
-    rowEl.classList.remove('playing');
-    rowEl.querySelector('.intro-play-icon').innerHTML = '&#9658;';
-    rowEl.querySelector('.intro-wave').style.display = 'none';
-    if (waveIcon) waveIcon.style.display = 'none';
-    currentIntroRow = null;
+    stopCurrentIntro();
   };
 }
 
@@ -1624,16 +1645,7 @@ function toggleListen() {
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
   if (isOpen) {
-    const player = document.getElementById('introPlayer');
-    if (player) player.pause();
-    if (currentIntroRow) {
-      currentIntroRow.classList.remove('playing');
-      currentIntroRow.querySelector('.intro-play-icon').innerHTML = '&#9658;';
-      currentIntroRow.querySelector('.intro-wave').style.display = 'none';
-      currentIntroRow = null;
-    }
-    const waveIcon = document.getElementById('listenWaveIcon');
-    if (waveIcon) waveIcon.style.display = 'none';
+    stopCurrentIntro();
   }
 }
 
