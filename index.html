@@ -1427,18 +1427,9 @@ function selectPlan(el, amount, plan) {
   }
 }
 
-const DOWNLOAD_LINKS = {
-  'Network': 'https://drive.google.com/uc?export=download&id=1UPLZhFKwVoMEKas6ACcsoK_XjBxlpaWO',
-  'Great Babylon': 'https://drive.google.com/uc?export=download&id=1zvUPY1H9b9VqEZ3NphHOa7i6aDK9V4mF',
-  'Hand From Above': 'https://drive.google.com/uc?export=download&id=1DdckclOCf2pXqGV9Sx-6z3FqSoVm4vPl',
-  "Let's Come Together": "https://drive.google.com/uc?export=download&id=157TvTvJ3-elr08cW9ykUT6pMrpOGatTV",
-  'My Baby Brown': 'https://drive.google.com/uc?export=download&id=1DK-HBSfzy4MmsOzrojRxM4zMrjhrxn2Q',
-  'Rough Road': 'https://drive.google.com/uc?export=download&id=1ElfwwQV0aSc9IyF-0vVVcCy9_aXXLMXM',
-  'Strange Love': 'https://drive.google.com/uc?export=download&id=124VUdiVVoHzr6jdM7WaF7uIzUILYlGxx',
-  'Them Are Plenty': 'https://drive.google.com/uc?export=download&id=1C5P7f_vuVZ7AS-9GtCvNPZbpnts5dUT_',
-  'Walking With The Lord': 'https://drive.google.com/uc?export=download&id=1axjA3JlQ0e_e-SOTJ8GV_Ec-ZGskBUde',
-  'Woman': 'https://drive.google.com/uc?export=download&id=18AKxXp3zv1JRoSlGjOU24I1X4MBMI8DA',
-};
+// NOTE: Full song files are never listed here. Sparrow verifies payment with
+// the backend, which checks directly with Paystack before issuing any
+// short-lived, signed download link.
 
 function initiatePayment() {
   if (selectedPlan === 1) {
@@ -1456,39 +1447,61 @@ function initiatePayment() {
     currency: 'NGN',
     ref: 'SPARROW_' + Math.floor(Math.random() * 1000000000),
     callback: function(response) {
-      try {
-        const resultDiv = document.getElementById('downloadResult');
-        const payBtn = document.querySelector('.pay-btn');
-        if (payBtn) payBtn.style.display = 'none';
+      const resultDiv = document.getElementById('downloadResult');
+      const payBtn = document.querySelector('.pay-btn');
+      if (payBtn) payBtn.style.display = 'none';
 
-        let linksHtml = '';
-        if (selectedPlan === 1) {
-          const song = document.getElementById('songSelect').value;
-          const url = DOWNLOAD_LINKS[song];
-          if (url) linksHtml = `<a href="${url}" target="_blank" download style="display:block;background:rgba(168,85,247,0.15);border:1px solid #a855f7;border-radius:8px;padding:10px 14px;color:#d8b4fe;font-family:'Space Mono',monospace;font-size:12px;text-decoration:none;font-weight:700;margin-bottom:6px;">&#11015; Download ${song}</a>`;
-        } else if (selectedPlan === 5) {
-          linksHtml = selectedSongs.map(title => {
-            const url = DOWNLOAD_LINKS[title];
-            return url ? `<a href="${url}" target="_blank" download style="display:block;background:rgba(168,85,247,0.15);border:1px solid #a855f7;border-radius:8px;padding:8px 14px;color:#d8b4fe;font-family:'Space Mono',monospace;font-size:11px;text-decoration:none;margin-bottom:6px;">&#11015; ${title}</a>` : '';
-          }).join('');
-        } else {
-          linksHtml = Object.entries(DOWNLOAD_LINKS).map(([title, url]) =>
-            `<a href="${url}" target="_blank" download style="display:block;background:rgba(168,85,247,0.15);border:1px solid #a855f7;border-radius:8px;padding:8px 14px;color:#d8b4fe;font-family:'Space Mono',monospace;font-size:11px;text-decoration:none;margin-bottom:6px;">&#11015; ${title}</a>`
+      resultDiv.innerHTML = `
+        <div style="font-size:20px;margin-bottom:8px;">&#9203;</div>
+        <div style="font-size:12px;color:#7dd3fc;">Confirming your payment, please wait...</div>
+      `;
+      resultDiv.style.display = 'block';
+      resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      const songsForPlan = selectedPlan === 1
+        ? [document.getElementById('songSelect').value]
+        : selectedPlan === 5
+          ? selectedSongs.slice()
+          : undefined;
+
+      fetch('https://sparrow-backend-0mgf.onrender.com/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reference: response.reference,
+          plan: selectedPlan,
+          songs: songsForPlan
+        })
+      })
+        .then(r => r.json().then(data => ({ ok: r.ok, data })))
+        .then(({ ok, data }) => {
+          if (!ok || data.status !== 'success') {
+            resultDiv.innerHTML = `
+              <div style="font-size:20px;margin-bottom:8px;">&#9888;</div>
+              <div style="font-size:12px;color:#fca5a5;font-weight:700;margin-bottom:4px;">We could not confirm this payment</div>
+              <div style="font-size:11px;color:#7aaac8;">${data.detail || 'Please contact Archer Man with your payment reference: ' + response.reference}</div>
+            `;
+            return;
+          }
+
+          const linksHtml = data.downloads.map(d =>
+            `<a href="${d.url}" target="_blank" style="display:block;background:rgba(168,85,247,0.15);border:1px solid #a855f7;border-radius:8px;padding:10px 14px;color:#d8b4fe;font-family:'Space Mono',monospace;font-size:12px;text-decoration:none;font-weight:700;margin-bottom:6px;">&#11015; ${d.title}</a>`
           ).join('');
-        }
 
-        resultDiv.innerHTML = `
-          <div style="font-size:20px;margin-bottom:8px;">&#9989;</div>
-          <div style="font-size:13px;color:#86efac;font-weight:700;margin-bottom:4px;">Payment Successful!</div>
-          <div style="font-size:12px;color:#d8b4fe;font-weight:700;margin-bottom:4px;">&#127881; Thank you for supporting Archer Man!</div>
-          <div style="font-size:11px;color:#7aaac8;margin-bottom:14px;">Your love keeps the music alive. Tap any song below to download.</div>
-          ${linksHtml}
-        `;
-        resultDiv.style.display = 'block';
-        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } catch(err) {
-        alert('Payment confirmed! Ref: ' + response.reference);
-      }
+          resultDiv.innerHTML = `
+            <div style="font-size:20px;margin-bottom:8px;">&#9989;</div>
+            <div style="font-size:13px;color:#86efac;font-weight:700;margin-bottom:4px;">Payment Successful!</div>
+            <div style="font-size:12px;color:#d8b4fe;font-weight:700;margin-bottom:4px;">&#127881; Thank you for supporting Archer Man!</div>
+            <div style="font-size:11px;color:#7aaac8;margin-bottom:14px;">These links expire in 10 minutes — tap now to download.</div>
+            ${linksHtml}
+          `;
+        })
+        .catch(() => {
+          resultDiv.innerHTML = `
+            <div style="font-size:20px;margin-bottom:8px;">&#9888;</div>
+            <div style="font-size:12px;color:#fca5a5;">Connection issue while confirming payment. Please contact Archer Man with reference: ${response.reference}</div>
+          `;
+        });
     },
     onClose: function() {}
   });
