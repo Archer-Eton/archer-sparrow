@@ -1019,6 +1019,7 @@
     <button class="quick-btn" onclick="sendQuick('What songs does Archer Man have?')">🎶 All Songs</button>
     <button class="quick-btn" onclick="sendQuick('How many songs has Archer Man released so far?')">💿 Songs Released</button>
     <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
+    <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
   </div>
 </div>
 
@@ -1650,6 +1651,67 @@ function toggleListen() {
 }
 
 let conversationHistory = [];
+
+// ── Fan Engagement: Name Capture ────────────────────────────────────────────
+function getFanName() {
+  return localStorage.getItem('sparrowFanName') || null;
+}
+
+function saveFanName() {
+  const input = document.getElementById('fanNameInput');
+  const name = input.value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  localStorage.setItem('sparrowFanName', name);
+  document.getElementById('fanNameModal').style.display = 'none';
+}
+
+function skipFanName() {
+  localStorage.setItem('sparrowFanName', '');
+  document.getElementById('fanNameModal').style.display = 'none';
+}
+
+function maybeAskFanName() {
+  const existing = localStorage.getItem('sparrowFanName');
+  if (existing === null) {
+    const modal = document.getElementById('fanNameModal');
+    if (modal) modal.style.display = 'flex';
+  }
+}
+
+// ── Fan Engagement: Weekly Leaderboard ──────────────────────────────────────
+function showLeaderboard() {
+  const modal = document.getElementById('leaderboardModal');
+  const content = document.getElementById('leaderboardContent');
+  if (!modal || !content) return;
+  modal.style.display = 'flex';
+  content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">Loading this week&#39;s most active fans...</div>';
+
+  fetch('https://sparrow-backend-0mgf.onrender.com/weekly-leaderboard')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.leaders || data.leaders.length === 0) {
+        content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">No activity recorded yet this week. Chat with Sparrow to be the first! 🎵</div>';
+        return;
+      }
+      const medals = ['🥇', '🥈', '🥉', '🎖️', '🎖️'];
+      content.innerHTML = data.leaders.map((l, i) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:8px;margin-bottom:6px;">
+          <span style="font-size:18px;">${medals[i] || '🎵'}</span>
+          <span style="flex:1;font-size:13px;color:var(--text);font-weight:${i===0?'700':'400'};">${l.name}</span>
+          <span style="font-size:11px;color:var(--gold);">${l.count} msgs</span>
+        </div>
+      `).join('');
+    })
+    .catch(() => {
+      content.innerHTML = '<div style="text-align:center;padding:20px;color:#fca5a5;font-size:12px;">Could not load leaderboard right now.</div>';
+    });
+}
+
+function closeLeaderboard() {
+  const modal = document.getElementById('leaderboardModal');
+  if (modal) modal.style.display = 'none';
+}
+
 let clearTimer = null;
 
 function showBooking() {
@@ -1791,6 +1853,7 @@ async function sendMessage() {
 
   const payload = {
     message: text,
+    fan_name: getFanName(),
     history: conversationHistory.slice(0, -1).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       content: m.content
@@ -1840,6 +1903,10 @@ async function sendMessage() {
   document.getElementById('sendBtn').disabled = false;
   input.focus();
 }
+
+window.addEventListener('DOMContentLoaded', () => {
+  maybeAskFanName();
+});
 </script>
 
 <!-- Booking Modal -->
@@ -1857,6 +1924,29 @@ async function sendMessage() {
       <a href="mailto:nkereuwemeton@gmail.com" style="font-size:0.85rem; color:#f0f4ff; text-decoration:none; font-weight:700; word-break:break-all;">nkereuwemeton@gmail.com</a>
     </div>
     <button onclick="closeBooking()" style="background:#c9a84c; color:#003153; border:none; border-radius:10px; padding:10px 28px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px; transition:background 0.2s;">CLOSE</button>
+  </div>
+</div>
+
+<!-- Fan Name Modal -->
+<div id="fanNameModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #c9a84c; border-radius:16px; padding:28px 24px; max-width:340px; width:90%; text-align:center; box-shadow:0 0 40px rgba(201,168,76,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:32px; margin-bottom:10px;">👋</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#c9a84c; margin-bottom:6px; font-weight:700;">What's your name?</div>
+    <div style="font-size:11px; color:#7aaac8; margin-bottom:16px; line-height:1.5;">Sparrow celebrates the most active fan each week. Tell us your name to join in!</div>
+    <input id="fanNameInput" type="text" placeholder="Your name" style="background:rgba(0,49,83,0.8); border:1px solid rgba(201,168,76,0.4); color:#f0f4ff; border-radius:8px; padding:10px 14px; width:100%; font-family:'Space Mono',monospace; font-size:13px; box-sizing:border-box; margin-bottom:14px;">
+    <button onclick="saveFanName()" style="background:#c9a84c; color:#003153; border:none; border-radius:10px; padding:10px 24px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px; width:100%; margin-bottom:8px;">Continue</button>
+    <button onclick="skipFanName()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%;">Skip for now</button>
+  </div>
+</div>
+
+<!-- Weekly Leaderboard Modal -->
+<div id="leaderboardModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #c9a84c; border-radius:16px; padding:24px 20px; max-width:360px; width:90%; text-align:center; box-shadow:0 0 40px rgba(201,168,76,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:32px; margin-bottom:8px;">🏆</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#c9a84c; margin-bottom:4px; font-weight:700;">Fan of the Week</div>
+    <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">Most active Sparrow fans this week</div>
+    <div id="leaderboardContent"></div>
+    <button onclick="closeLeaderboard()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
   </div>
 </div>
 
