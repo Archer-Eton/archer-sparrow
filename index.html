@@ -1818,11 +1818,17 @@ async function sendMessage() {
 
     clearTimeout(wakeupNoticeTimer);
     const data = await response.json();
-    const reply = data.reply || "I'm having trouble connecting right now. Please try again!";
 
-    hideTyping();
-    addMessage('bot', reply);
-    conversationHistory.push({ role: 'assistant', content: reply });
+    if (!response.ok) {
+      // Backend returned a specific, human-readable reason — show it directly
+      hideTyping();
+      addMessage('bot', data.detail || "Sparrow had trouble responding. Please try again in a moment.");
+    } else {
+      const reply = data.reply || "Sparrow had trouble responding. Please try again.";
+      hideTyping();
+      addMessage('bot', reply);
+      conversationHistory.push({ role: 'assistant', content: reply });
+    }
 
   } catch (err) {
     clearTimeout(wakeupNoticeTimer);
