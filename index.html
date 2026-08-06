@@ -784,7 +784,55 @@
     animation: fadeUp 0.8s 0.36s ease both;
   }
 
-  .watch-header {
+  .creation-section {
+    width: 100%;
+    max-width: 720px;
+    padding: 0 20px;
+    margin: 0 auto 16px;
+    animation: fadeUp 0.8s 0.38s ease both;
+  }
+
+  .creation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #003153 60%, #004a7a);
+    border-radius: 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 2.5px #e8dcc0,
+      0 0 12px rgba(232,220,192,0.4),
+      0 0 24px rgba(232,220,192,0.2);
+    transition: box-shadow 0.3s ease;
+    animation: creationPulse 2.5s ease-in-out infinite;
+  }
+
+  .creation-header:hover {
+    box-shadow:
+      0 0 0 2.5px #f5edd8,
+      0 0 20px rgba(245,237,216,0.6),
+      0 0 40px rgba(245,237,216,0.3);
+  }
+
+  @keyframes creationPulse {
+    0%, 100% { box-shadow: 0 0 0 2.5px #e8dcc0, 0 0 12px rgba(232,220,192,0.4), 0 0 24px rgba(232,220,192,0.2); }
+    50%       { box-shadow: 0 0 0 2.5px #f5edd8, 0 0 20px rgba(245,237,216,0.6), 0 0 40px rgba(245,237,216,0.3); }
+  }
+
+  .creation-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #e8dcc0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(232,220,192,0.5);
+  }
+
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1020,6 +1068,7 @@
     <button class="quick-btn" onclick="sendQuick('How many songs has Archer Man released so far?')">💿 Songs Released</button>
     <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
     <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
+    <button class="quick-btn" onclick="sendQuick('Tell me about the Creation Knowledge section')">📖 Creation Knowledge</button>
   </div>
 </div>
 
@@ -1124,6 +1173,33 @@
 
     <div style="padding:10px 0 4px; text-align:center;">
       <button class="subscribe-yt-btn" onclick="goSubscribe()">&#9658; Subscribe</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="creation-section">
+  <div class="creation-header" onclick="toggleCreation()">
+    <div class="creation-title" style="flex:1; justify-content:center; text-align:center;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#e8dcc0"><path d="M12 2C8 2 5 5 5 9c0 3 2 5.5 4 6.5V19c0 .5.5 1 1 1h4c.5 0 1-.5 1-1v-3.5c2-1 4-3.5 4-6.5 0-4-3-7-7-7zM9 21h6v1H9v-1z"/></svg>
+      <span>Creation Knowledge</span>
+    </div>
+    <svg class="chevron" id="creationChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+  <div id="creationTracks" style="display:none; flex-direction:column; gap:14px; background:var(--dark3); border:1px solid rgba(232,220,192,0.15); border-top:none; border-radius:0 0 12px 12px; padding:16px;">
+
+    <div style="font-size:13px; line-height:1.8; color:var(--text);">
+      Archer Man's music is rooted in a deep search for truth &mdash; the development of Creation, the Laws that govern it, and Man's relationship with the Creator. This section is a doorway into that same search.
+      <br><br>
+      Much of this understanding draws from <em>In the Light of Truth &mdash; The Grail Message</em>, a foundational work exploring these Laws in depth. Rather than excerpt it here, Sparrow points you straight to the official source &mdash; so you can explore it in full, at your own pace.
+    </div>
+
+    <a href="https://ng.grailmessage.com/grail-message.html" target="_blank" style="display:block; text-align:center; background:linear-gradient(180deg, #e8dcc0 0%, #a8916a 100%); color:#1a1400; padding:12px 16px; border-radius:100px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:1px; text-decoration:none; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
+      &#128214; Explore the Grail Message (Official Site)
+    </a>
+
+    <div style="font-size:10px; color:var(--text-muted); text-align:center; letter-spacing:0.5px;">
+      Available in English &amp; French &middot; eBooks &amp; print &middot; ng.grailmessage.com
     </div>
 
   </div>
@@ -1556,6 +1632,14 @@ function goSubscribe() {
 function toggleWatch() {
   const tracks = document.getElementById('watchTracks');
   const chevron = document.getElementById('watchChevron');
+  const isOpen = tracks.style.display === 'flex';
+  tracks.style.display = isOpen ? 'none' : 'flex';
+  chevron.classList.toggle('open', !isOpen);
+}
+
+function toggleCreation() {
+  const tracks = document.getElementById('creationTracks');
+  const chevron = document.getElementById('creationChevron');
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
