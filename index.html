@@ -792,7 +792,87 @@
     animation: fadeUp 0.8s 0.38s ease both;
   }
 
-  .creation-header {
+  .news-section {
+    width: 100%;
+    max-width: 720px;
+    padding: 0 20px;
+    margin: 0 auto 16px;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+
+  .news-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #003153 60%, #004a7a);
+    border-radius: 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 2.5px #ff5c93,
+      0 0 12px rgba(255,92,147,0.4),
+      0 0 24px rgba(255,92,147,0.2);
+    transition: box-shadow 0.3s ease;
+    animation: newsPulse 2.5s ease-in-out infinite;
+  }
+
+  .news-header:hover {
+    box-shadow:
+      0 0 0 2.5px #ff85ad,
+      0 0 20px rgba(255,133,173,0.6),
+      0 0 40px rgba(255,133,173,0.3);
+  }
+
+  @keyframes newsPulse {
+    0%, 100% { box-shadow: 0 0 0 2.5px #ff5c93, 0 0 12px rgba(255,92,147,0.4), 0 0 24px rgba(255,92,147,0.2); }
+    50%       { box-shadow: 0 0 0 2.5px #ff85ad, 0 0 20px rgba(255,133,173,0.6), 0 0 40px rgba(255,133,173,0.3); }
+  }
+
+  .news-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff5c93;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255,92,147,0.5);
+  }
+
+  .news-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .news-item-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #ff5c93;
+    text-transform: uppercase;
+  }
+
+  .news-video-frame {
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 177.7%; /* vertical 9:16 for short-form clips */
+    height: 0;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .news-video-frame iframe {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 10px;
+  }
+
+
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1069,6 +1149,7 @@
     <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
     <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
     <button class="quick-btn" onclick="sendQuick('Tell me about the Creation Knowledge section')">📖 Creation Knowledge</button>
+    <button class="quick-btn" onclick="sendQuick('Any news or updates from Archer Man?')">📰 News &amp; Updates</button>
   </div>
 </div>
 
@@ -1201,6 +1282,27 @@
     <div style="font-size:10px; color:var(--text-muted); text-align:center; letter-spacing:0.5px;">
       Available in English &amp; French &middot; eBooks &amp; print &middot; ng.grailmessage.com
     </div>
+
+  </div>
+</div>
+
+<div class="news-section">
+  <div class="news-header" onclick="toggleNews()">
+    <div class="news-title" style="flex:1; justify-content:center; text-align:center;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#ff5c93"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h10v2H4v-2z"/></svg>
+      <span>News &amp; Updates</span>
+    </div>
+    <svg class="chevron" id="newsChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+  <div id="newsTracks" style="display:none; flex-direction:column; gap:16px; background:var(--dark3); border:1px solid rgba(255,92,147,0.15); border-top:none; border-radius:0 0 12px 12px; padding:16px;">
+
+    <!-- NEWS_ITEMS_START -->
+    <div style="text-align:center; padding:24px 12px; color:var(--text-muted); font-size:12px; line-height:1.7;">
+      🎬 Fresh updates from Archer Man land here soon &mdash; quick clips, announcements, and behind-the-scenes moments.
+      <br><br>
+      Check back soon!
+    </div>
+    <!-- NEWS_ITEMS_END -->
 
   </div>
 </div>
@@ -1640,6 +1742,14 @@ function toggleWatch() {
 function toggleCreation() {
   const tracks = document.getElementById('creationTracks');
   const chevron = document.getElementById('creationChevron');
+  const isOpen = tracks.style.display === 'flex';
+  tracks.style.display = isOpen ? 'none' : 'flex';
+  chevron.classList.toggle('open', !isOpen);
+}
+
+function toggleNews() {
+  const tracks = document.getElementById('newsTracks');
+  const chevron = document.getElementById('newsChevron');
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
