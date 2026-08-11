@@ -800,6 +800,76 @@
     animation: fadeUp 0.8s 0.4s ease both;
   }
 
+  .comment-section {
+    width: 100%;
+    max-width: 720px;
+    padding: 0 20px;
+    margin: 0 auto 16px;
+    animation: fadeUp 0.8s 0.42s ease both;
+  }
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #003153 60%, #004a7a);
+    border-radius: 12px;
+    padding: 13px 18px;
+    cursor: pointer;
+    box-shadow:
+      0 0 0 2.5px #4ade80,
+      0 0 12px rgba(74,222,128,0.4),
+      0 0 24px rgba(74,222,128,0.2);
+    transition: box-shadow 0.3s ease;
+    animation: commentPulse 2.5s ease-in-out infinite;
+  }
+
+  .comment-header:hover {
+    box-shadow:
+      0 0 0 2.5px #86efac,
+      0 0 20px rgba(134,239,172,0.6),
+      0 0 40px rgba(134,239,172,0.3);
+  }
+
+  @keyframes commentPulse {
+    0%, 100% { box-shadow: 0 0 0 2.5px #4ade80, 0 0 12px rgba(74,222,128,0.4), 0 0 24px rgba(74,222,128,0.2); }
+    50%       { box-shadow: 0 0 0 2.5px #86efac, 0 0 20px rgba(134,239,172,0.6), 0 0 40px rgba(134,239,172,0.3); }
+  }
+
+  .comment-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(74,222,128,0.5);
+  }
+
+  .comment-item {
+    background: rgba(74,222,128,0.06);
+    border: 1px solid rgba(74,222,128,0.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .comment-item-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #86efac;
+    margin-bottom: 4px;
+  }
+
+  .comment-item-text {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+
+
   .news-header {
     display: flex;
     align-items: center;
@@ -873,6 +943,7 @@
   }
 
 
+  .creation-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -913,6 +984,7 @@
   }
 
 
+  .watch-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1150,6 +1222,7 @@
     <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
     <button class="quick-btn" onclick="sendQuick('Tell me about the Creation Knowledge section')">📖 Creation Knowledge</button>
     <button class="quick-btn" onclick="sendQuick('Any news or updates from Archer Man?')">📰 News &amp; Updates</button>
+    <button class="quick-btn" onclick="toggleComments(); document.getElementById('commentTracks').scrollIntoView({behavior:'smooth', block:'center'});">💬 Comments</button>
   </div>
 </div>
 
@@ -1303,6 +1376,29 @@
       Check back soon!
     </div>
     <!-- NEWS_ITEMS_END -->
+
+  </div>
+</div>
+
+<div class="comment-section">
+  <div class="comment-header" onclick="toggleComments()">
+    <div class="comment-title" style="flex:1; justify-content:center; text-align:center;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#4ade80"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+      <span>Comments</span>
+    </div>
+    <svg class="chevron" id="commentChevron" width="14" height="14" viewBox="0 0 24 24" fill="var(--text-muted)"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+  </div>
+  <div id="commentTracks" style="display:none; flex-direction:column; gap:14px; background:var(--dark3); border:1px solid rgba(74,222,128,0.15); border-top:none; border-radius:0 0 12px 12px; padding:16px;">
+
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <input id="commentNameInput" type="text" placeholder="Your name" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box;">
+      <textarea id="commentTextInput" placeholder="Leave a comment for Archer Man..." rows="3" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box; resize:vertical;"></textarea>
+      <button onclick="submitComment()" style="background:linear-gradient(180deg, #4ade80 0%, #16a34a 100%); color:#052e0f; border:none; border-radius:100px; padding:10px 16px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:1px; cursor:pointer;">Post Comment</button>
+    </div>
+
+    <div id="commentsList" style="display:flex; flex-direction:column; gap:10px; margin-top:4px;">
+      <div style="text-align:center; padding:14px; color:var(--text-muted); font-size:11px;">Loading comments...</div>
+    </div>
 
   </div>
 </div>
@@ -1753,6 +1849,81 @@ function toggleNews() {
   const isOpen = tracks.style.display === 'flex';
   tracks.style.display = isOpen ? 'none' : 'flex';
   chevron.classList.toggle('open', !isOpen);
+}
+
+function toggleComments() {
+  const tracks = document.getElementById('commentTracks');
+  const chevron = document.getElementById('commentChevron');
+  const isOpen = tracks.style.display === 'flex';
+  tracks.style.display = isOpen ? 'none' : 'flex';
+  chevron.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    loadComments();
+    const savedName = getFanName();
+    const nameInput = document.getElementById('commentNameInput');
+    if (savedName && nameInput && !nameInput.value) nameInput.value = savedName;
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function loadComments() {
+  const list = document.getElementById('commentsList');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:11px;">Loading comments...</div>';
+
+  fetch('https://sparrow-backend-0mgf.onrender.com/comments')
+    .then(r => r.json())
+    .then(data => {
+      if (!data.comments || data.comments.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:14px;color:var(--text-muted);font-size:11px;">No comments yet. Be the first! 💬</div>';
+        return;
+      }
+      list.innerHTML = data.comments.map(c => `
+        <div class="comment-item">
+          <div class="comment-item-name">${escapeHtml(c.name)}</div>
+          <div class="comment-item-text">${escapeHtml(c.comment)}</div>
+        </div>
+      `).join('');
+    })
+    .catch(() => {
+      list.innerHTML = '<div style="text-align:center;padding:14px;color:#fca5a5;font-size:11px;">Could not load comments right now.</div>';
+    });
+}
+
+function submitComment() {
+  const nameInput = document.getElementById('commentNameInput');
+  const textInput = document.getElementById('commentTextInput');
+  const savedName = getFanName();
+
+  const name = (nameInput.value.trim()) || savedName || '';
+  const comment = textInput.value.trim();
+
+  if (!name) { alert('Please enter your name.'); return; }
+  if (!comment) { alert('Please write a comment.'); return; }
+
+  fetch('https://sparrow-backend-0mgf.onrender.com/comments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name, comment: comment })
+  })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) {
+        alert(data.detail || 'Could not post your comment. Please try again.');
+        return;
+      }
+      textInput.value = '';
+      if (!nameInput.value.trim() && name) nameInput.value = name;
+      loadComments();
+    })
+    .catch(() => {
+      alert('Connection issue. Please try again.');
+    });
 }
 
 const INTRO_LINKS = {
