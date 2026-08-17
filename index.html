@@ -1220,6 +1220,9 @@
     <button class="quick-btn" onclick="sendQuick('How many songs has Archer Man released so far?')">💿 Songs Released</button>
     <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
     <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
+    <button class="quick-btn" onclick="showReferral()">🎁 Refer &amp; Earn</button>
+    <button class="quick-btn" onclick="showPatron()">🎖️ Patron of Sparrow</button>
+    <button class="quick-btn" onclick="showUnreleasedTracks()">🔓 Unreleased Tracks</button>
     <button class="quick-btn" onclick="sendQuick('Tell me about the Creation Knowledge section')">📖 Creation Knowledge</button>
     <button class="quick-btn" onclick="sendQuick('Any news or updates from Archer Man?')">📰 News &amp; Updates</button>
     <button class="quick-btn" onclick="toggleComments(); document.getElementById('commentTracks').scrollIntoView({behavior:'smooth', block:'center'});">💬 Comments</button>
@@ -1745,7 +1748,8 @@ function initiatePayment() {
         body: JSON.stringify({
           reference: response.reference,
           plan: selectedPlan,
-          songs: songsForPlan
+          songs: songsForPlan,
+          fan_id: getFanId()
         })
       })
         .then(r => r.json().then(data => ({ ok: r.ok, data })))
@@ -1909,7 +1913,7 @@ function submitComment() {
   fetch('https://sparrow-backend-0mgf.onrender.com/comments', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: name, comment: comment })
+    body: JSON.stringify({ name: name, comment: comment, fan_id: getFanId() })
   })
     .then(r => r.json().then(data => ({ ok: r.ok, data })))
     .then(({ ok, data }) => {
@@ -2022,12 +2026,48 @@ function getFanName() {
   return localStorage.getItem('sparrowFanName') || null;
 }
 
+function getFanId() {
+  let id = localStorage.getItem('sparrowFanId');
+  if (!id) {
+    id = 'fan_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 10);
+    localStorage.setItem('sparrowFanId', id);
+  }
+  return id;
+}
+
+function getReferredBy() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('ref') || null;
+}
+
+function registerFanIfNeeded() {
+  const fanId = getFanId();
+  const referredBy = getReferredBy();
+  fetch('https://sparrow-backend-0mgf.onrender.com/fan/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fan_id: fanId, referred_by: referredBy })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.referral_code) localStorage.setItem('sparrowReferralCode', data.referral_code);
+    })
+    .catch(() => {});
+}
+
 function saveFanName() {
-  const input = document.getElementById('fanNameInput');
-  const name = input.value.trim();
+  const nameInput = document.getElementById('fanNameInput');
+  const locInput = document.getElementById('fanLocationInput');
+  const name = nameInput.value.trim();
+  const location = locInput ? locInput.value.trim() : '';
   if (!name) { alert('Please enter your name.'); return; }
   localStorage.setItem('sparrowFanName', name);
+  if (location) localStorage.setItem('sparrowFanLocation', location);
   document.getElementById('fanNameModal').style.display = 'none';
+}
+
+function getFanLocation() {
+  return localStorage.getItem('sparrowFanLocation') || null;
 }
 
 function skipFanName() {
@@ -2041,6 +2081,112 @@ function maybeAskFanName() {
     const modal = document.getElementById('fanNameModal');
     if (modal) modal.style.display = 'flex';
   }
+}
+
+// ── Referral & Patron ────────────────────────────────────────────────────────
+function showReferral() {
+  const modal = document.getElementById('referralModal');
+  if (!modal) return;
+  const code = localStorage.getItem('sparrowReferralCode');
+  const link = code ? `https://archer-sparrow.vercel.app/?ref=${code}` : null;
+  const content = document.getElementById('referralContent');
+  if (content) {
+    content.innerHTML = link
+      ? `<div style="font-size:11px;color:#7aaac8;margin-bottom:10px;">Share this link — every 3 friends who join earns you a free song download!</div>
+         <div style="background:rgba(0,49,83,0.8);border:1px solid rgba(74,222,128,0.3);border-radius:8px;padding:10px 12px;font-size:11px;color:#f0f4ff;word-break:break-all;margin-bottom:10px;">${link}</div>
+         <button onclick="navigator.clipboard.writeText('${link}').then(()=>alert('Link copied!'))" style="background:linear-gradient(180deg,#4ade80 0%,#16a34a 100%);color:#052e0f;border:none;border-radius:100px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;cursor:pointer;width:100%;">Copy My Referral Link</button>`
+      : `<div style="font-size:11px;color:#7aaac8;">Chat with Sparrow once first to get your referral link!</div>`;
+  }
+  modal.style.display = 'flex';
+}
+
+function closeReferral() {
+  const modal = document.getElementById('referralModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function showPatron() {
+  const modal = document.getElementById('patronModal');
+  const content = document.getElementById('patronContent');
+  if (!modal || !content) return;
+  modal.style.display = 'flex';
+  content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">Loading...</div>';
+
+  fetch('https://sparrow-backend-0mgf.onrender.com/patron/current')
+    .then(r => r.json())
+    .then(data => {
+      if (data.status !== 'success') {
+        content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">No Patron yet — be the first to collect 10 songs! 🎖️</div>';
+        return;
+      }
+      const photo = data.photo_url
+        ? `<img src="${data.photo_url}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e8dcc0;margin-bottom:10px;">`
+        : `<div style="width:80px;height:80px;border-radius:50%;background:rgba(232,220,192,0.15);border:3px solid #e8dcc0;display:flex;align-items:center;justify-content:center;font-size:28px;color:#e8dcc0;margin:0 auto 10px;">${(data.name||'?').charAt(0).toUpperCase()}</div>`;
+      content.innerHTML = `
+        <div style="text-align:center;">
+          ${photo}
+          <div style="font-size:15px;font-weight:700;color:#e8dcc0;margin-bottom:4px;">${data.name}</div>
+          <div style="font-size:10px;color:#7aaac8;letter-spacing:1px;">${data.distinct_count} songs collected</div>
+        </div>`;
+    })
+    .catch(() => {
+      content.innerHTML = '<div style="text-align:center;padding:20px;color:#fca5a5;font-size:12px;">Could not load Patron info.</div>';
+    });
+}
+
+function closePatron() {
+  const modal = document.getElementById('patronModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function renderUnreleasedTracks(content, tracks, badgeLabel) {
+  const badge = `<div style="font-size:10px;color:#c9a84c;letter-spacing:1px;margin-bottom:10px;">${badgeLabel}</div>`;
+  const list = tracks.map(t => `
+    <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:8px;padding:10px 12px;margin-bottom:8px;text-align:left;">
+      <div style="color:#f0f4ff;font-size:13px;margin-bottom:6px;">🎧 ${t.title}</div>
+      <audio controls controlsList="nodownload noplaybackrate" oncontextmenu="return false;" style="width:100%;height:32px;" src="${t.url}"></audio>
+    </div>
+  `).join('');
+  content.innerHTML = badge + list + '<div style="font-size:10px;color:#7aaac8;margin-top:8px;">For your listening pleasure only — not available for download.</div>';
+}
+
+function showUnreleasedTracks() {
+  const modal = document.getElementById('unreleasedModal');
+  const content = document.getElementById('unreleasedContent');
+  if (!modal || !content) return;
+  modal.style.display = 'flex';
+  content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">Checking your access...</div>';
+
+  const fanId = getFanId();
+
+  fetch(`https://sparrow-backend-0mgf.onrender.com/fan-of-week/tracks?fan_id=${encodeURIComponent(fanId)}`)
+    .then(r => r.ok ? r.json() : Promise.reject())
+    .then(data => {
+      if (data.status === 'success' && data.tracks && data.tracks.length > 0) {
+        renderUnreleasedTracks(content, data.tracks, '🏆 Your Fan of the Week reward');
+        return;
+      }
+      return Promise.reject();
+    })
+    .catch(() => {
+      fetch(`https://sparrow-backend-0mgf.onrender.com/patron/tracks?fan_id=${encodeURIComponent(fanId)}`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(data => {
+          if (data.status === 'success' && data.tracks && data.tracks.length > 0) {
+            renderUnreleasedTracks(content, data.tracks, '🎖️ Your Patron of Sparrow reward');
+          } else {
+            content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">Locked for now. Become this week\'s Fan of the Week or the Patron of Sparrow to unlock 3 unreleased tracks! 🔒</div>';
+          }
+        })
+        .catch(() => {
+          content.innerHTML = '<div style="text-align:center;padding:20px;color:#7aaac8;font-size:12px;">Locked for now. Become this week\'s Fan of the Week or the Patron of Sparrow to unlock 3 unreleased tracks! 🔒</div>';
+        });
+    });
+}
+
+function closeUnreleased() {
+  const modal = document.getElementById('unreleasedModal');
+  if (modal) modal.style.display = 'none';
 }
 
 // ── Fan Engagement: Weekly Leaderboard ──────────────────────────────────────
@@ -2219,6 +2365,9 @@ async function sendMessage() {
   const payload = {
     message: text,
     fan_name: getFanName(),
+    fan_id: getFanId(),
+    location: getFanLocation(),
+    referred_by: getReferredBy(),
     history: conversationHistory.slice(0, -1).map(m => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       content: m.content
@@ -2271,6 +2420,7 @@ async function sendMessage() {
 
 window.addEventListener('DOMContentLoaded', () => {
   maybeAskFanName();
+  registerFanIfNeeded();
 });
 </script>
 
@@ -2298,7 +2448,8 @@ window.addEventListener('DOMContentLoaded', () => {
     <div style="font-size:32px; margin-bottom:10px;">👋</div>
     <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#c9a84c; margin-bottom:6px; font-weight:700;">What's your name?</div>
     <div style="font-size:11px; color:#7aaac8; margin-bottom:16px; line-height:1.5;">Sparrow celebrates the most active fan each week. Tell us your name to join in!</div>
-    <input id="fanNameInput" type="text" placeholder="Your name" style="background:rgba(0,49,83,0.8); border:1px solid rgba(201,168,76,0.4); color:#f0f4ff; border-radius:8px; padding:10px 14px; width:100%; font-family:'Space Mono',monospace; font-size:13px; box-sizing:border-box; margin-bottom:14px;">
+    <input id="fanNameInput" type="text" placeholder="Your name" style="background:rgba(0,49,83,0.8); border:1px solid rgba(201,168,76,0.4); color:#f0f4ff; border-radius:8px; padding:10px 14px; width:100%; font-family:'Space Mono',monospace; font-size:13px; box-sizing:border-box; margin-bottom:10px;">
+    <input id="fanLocationInput" type="text" placeholder="Where are you chatting from? (optional)" style="background:rgba(0,49,83,0.8); border:1px solid rgba(201,168,76,0.4); color:#f0f4ff; border-radius:8px; padding:10px 14px; width:100%; font-family:'Space Mono',monospace; font-size:13px; box-sizing:border-box; margin-bottom:14px;">
     <button onclick="saveFanName()" style="background:#c9a84c; color:#003153; border:none; border-radius:10px; padding:10px 24px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; cursor:pointer; letter-spacing:1px; width:100%; margin-bottom:8px;">Continue</button>
     <button onclick="skipFanName()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%;">Skip for now</button>
   </div>
@@ -2312,6 +2463,39 @@ window.addEventListener('DOMContentLoaded', () => {
     <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">Most active Sparrow fans this week</div>
     <div id="leaderboardContent"></div>
     <button onclick="closeLeaderboard()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
+  </div>
+</div>
+
+<!-- Referral Modal -->
+<div id="referralModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #4ade80; border-radius:16px; padding:24px 20px; max-width:360px; width:90%; text-align:center; box-shadow:0 0 40px rgba(74,222,128,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:32px; margin-bottom:8px;">🎁</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#4ade80; margin-bottom:4px; font-weight:700;">Refer &amp; Earn</div>
+    <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">3 friends = 1 free song</div>
+    <div id="referralContent"></div>
+    <button onclick="closeReferral()" style="background:transparent; color:#7aaac8; border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
+  </div>
+</div>
+
+<!-- Patron Modal -->
+<div id="patronModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #e8dcc0; border-radius:16px; padding:24px 20px; max-width:360px; width:90%; text-align:center; box-shadow:0 0 40px rgba(232,220,192,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:32px; margin-bottom:8px;">🎖️</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#e8dcc0; margin-bottom:4px; font-weight:700;">Patron of Sparrow</div>
+    <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">First fan to collect 10 songs</div>
+    <div id="patronContent"></div>
+    <button onclick="closePatron()" style="background:transparent; color:#7aaac8; border:1px solid rgba(232,220,192,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
+  </div>
+</div>
+
+<!-- Unreleased Tracks Modal -->
+<div id="unreleasedModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #c9a84c; border-radius:16px; padding:24px 20px; max-width:360px; width:90%; text-align:center; box-shadow:0 0 40px rgba(201,168,76,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:32px; margin-bottom:8px;">🔓</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.2rem; color:#c9a84c; margin-bottom:4px; font-weight:700;">Unreleased Tracks</div>
+    <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">Fan of the Week &amp; Patron exclusive</div>
+    <div id="unreleasedContent"></div>
+    <button onclick="closeUnreleased()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
   </div>
 </div>
 
