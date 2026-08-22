@@ -1370,10 +1370,14 @@
   <div id="newsTracks" style="display:none; flex-direction:column; gap:16px; background:var(--dark3); border:1px solid rgba(255,92,147,0.15); border-top:none; border-radius:0 0 12px 12px; padding:16px;">
 
     <!-- NEWS_ITEMS_START -->
-    <div style="text-align:center; padding:24px 12px; color:var(--text-muted); font-size:12px; line-height:1.7;">
-      🎬 Fresh updates from Archer Man land here soon &mdash; quick clips, announcements, and behind-the-scenes moments.
-      <br><br>
-      Check back soon!
+    <div class="news-item">
+      <div class="news-item-label">📣 New on Sparrow</div>
+      <div style="background:rgba(255,92,147,0.08); border:1px solid rgba(255,92,147,0.25); border-radius:10px; padding:14px 16px;">
+        <div style="font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:#ff5c93; margin-bottom:6px;">🎧 DJ HAVOCK NOW ON SPARROW!</div>
+        <div style="font-size:12.5px; color:var(--text); line-height:1.6;">
+          A new artist joins the Sparrow family! DJ Havock's tracks will be landing in the Listen Now section soon &mdash; stay tuned for the full bio and first drops.
+        </div>
+      </div>
     </div>
     <!-- NEWS_ITEMS_END -->
 
@@ -1675,11 +1679,12 @@ function selectPlan(el, amount, plan) {
   const singleBox = document.getElementById('singleSongBox');
   if (singleBox) singleBox.style.display = plan === 1 ? 'block' : 'none';
 
-  // 5-song picker
+  // Multi-song picker — used for both the 5-song and any-10-song plans
+  requiredSongCount = plan === 9 ? 10 : 5;
   const fiveSel = document.getElementById('fiveSongSelector');
   if (fiveSel) {
-    fiveSel.style.display = plan === 5 ? 'block' : 'none';
-    if (plan === 5) {
+    fiveSel.style.display = (plan === 5 || plan === 9) ? 'block' : 'none';
+    if (plan === 5 || plan === 9) {
       selectedSongs = [];
       document.querySelectorAll('.song-pick-btn').forEach(b => {
         b.classList.remove('picked','disabled');
@@ -1689,16 +1694,12 @@ function selectPlan(el, amount, plan) {
     }
   }
 
-  // Bundle notice — full collection only
-  const notice = document.getElementById('bundleNotice');
-  if (notice) notice.style.display = plan === 9 ? 'block' : 'none';
-
   // Pay button text
   const payBtn = document.querySelector('.pay-btn');
   if (payBtn) {
     if (plan === 1) payBtn.innerHTML = '&#128179; Pay &#8358;200';
     else if (plan === 5) payBtn.innerHTML = '&#128179; Pay &#8358;950 &mdash; 5 Songs';
-    else payBtn.innerHTML = '&#128179; Pay &#8358;1,800 &mdash; All 10 Songs';
+    else payBtn.innerHTML = '&#128179; Pay &#8358;1,800 &mdash; Any 10 Songs';
   }
 }
 
@@ -1713,6 +1714,9 @@ function initiatePayment() {
   }
   if (selectedPlan === 5) {
     if (selectedSongs.length !== 5) { alert('Please select exactly 5 songs.'); return; }
+  }
+  if (selectedPlan === 9) {
+    if (selectedSongs.length !== 10) { alert('Please select exactly 10 songs.'); return; }
   }
 
   const handler = PaystackPop.setup({
@@ -1735,9 +1739,7 @@ function initiatePayment() {
 
       const songsForPlan = selectedPlan === 1
         ? [document.getElementById('songSelect').value]
-        : selectedPlan === 5
-          ? selectedSongs.slice()
-          : undefined;
+        : selectedSongs.slice();
 
       fetch('https://sparrow-backend-0mgf.onrender.com/verify-payment', {
         method: 'POST',
@@ -1787,6 +1789,7 @@ function initiatePayment() {
 
 // Track selected songs for 5-song bundle
 let selectedSongs = [];
+let requiredSongCount = 5;
 
 function toggleSongPick(el) {
   const song = el.getAttribute('data-song');
@@ -1797,7 +1800,7 @@ function toggleSongPick(el) {
     el.classList.remove('picked');
     el.querySelector('.pick-tick').textContent = '○';
   } else {
-    if (selectedSongs.length >= 5) return; // Max 5
+    if (selectedSongs.length >= requiredSongCount) return;
     selectedSongs.push(song);
     el.classList.add('picked');
     el.querySelector('.pick-tick').textContent = '✓';
@@ -1809,16 +1812,16 @@ function updateCheckCount() {
   const count = selectedSongs.length;
   const countEl = document.getElementById('checkCount');
   if (countEl) {
-    countEl.innerHTML = count < 5
-      ? `Tap to select songs (${count}/5 selected)`
-      : `✓ 5 songs selected — Please pay to download`;
-    countEl.style.color = count === 5 ? '#86efac' : '#a5b4fc';
+    countEl.innerHTML = count < requiredSongCount
+      ? `Tap to select songs (${count}/${requiredSongCount} selected)`
+      : `✓ ${requiredSongCount} songs selected — Please pay to download`;
+    countEl.style.color = count === requiredSongCount ? '#86efac' : '#a5b4fc';
   }
 
-  // Disable unselected buttons once 5 chosen
+  // Disable unselected buttons once the required count is reached
   document.querySelectorAll('.song-pick-btn').forEach(btn => {
     if (!btn.classList.contains('picked')) {
-      btn.classList.toggle('disabled', count >= 5);
+      btn.classList.toggle('disabled', count >= requiredSongCount);
     }
   });
 }
@@ -2545,8 +2548,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
       <div class="price-card" onclick="selectPlan(this,1800,9)" id="plan3" style="margin-bottom:8px;">
         <div class="price-amount">&#8358;1,800</div>
-        <div class="price-desc">Full Collection &#8212; All 10 Songs</div>
-        <div style="font-size:9px;color:#7aaac8;margin-top:3px;letter-spacing:1px;">All 10 download links delivered</div>
+        <div class="price-desc">Any 10 Songs Bundle</div>
+        <div style="font-size:9px;color:#7aaac8;margin-top:3px;letter-spacing:1px;">Choose exactly 10 songs below after selecting</div>
       </div>
 
     </div>
@@ -2583,11 +2586,6 @@ window.addEventListener('DOMContentLoaded', () => {
         <div class="song-pick-btn" data-song="My Baby Brown" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> My Baby Brown</div>
         <div class="song-pick-btn" data-song="Hand From Above" onclick="toggleSongPick(this)"><span class="pick-tick">&#9675;</span> Hand From Above</div>
       </div>
-    </div>
-
-    <!-- Bundle notice (full collection only) -->
-    <div id="bundleNotice" style="display:none; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:8px; padding:10px; font-size:11px; color:#7dd3fc; text-align:center; margin-top:10px; letter-spacing:0.5px;">
-      &#127925; All 10 download links will be delivered after payment
     </div>
 
     <!-- Pay button -->
@@ -2650,8 +2648,8 @@ window.addEventListener('DOMContentLoaded', () => {
       <!-- Plan 3: Full Collection -->
       <div class="price-card" onclick="selectPlan(this,1800,9)" id="plan3">
         <div class="price-amount">&#8358;1,800</div>
-        <div class="price-desc">Full Collection &mdash; All 10 Songs</div>
-        <div style="font-size:9px;color:#7aaac8;margin-top:4px;letter-spacing:1px;">All 10 download links delivered</div>
+        <div class="price-desc">Any 10 Songs Bundle</div>
+        <div style="font-size:9px;color:#7aaac8;margin-top:4px;letter-spacing:1px;">Choose exactly 10 songs below after selecting</div>
       </div>
 
     </div>
