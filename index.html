@@ -213,6 +213,43 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.4);
   }
 
+  .platform-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+  .platform-icon-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  }
+  .platform-icon-btn svg { width: 20px; height: 20px; }
+
+  .roster-caption {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 700;
+    opacity: 0.85;
+  }
+  .roster-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--gold-light);
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 14px rgba(201,168,76,0.35);
+    margin-top: 4px;
+  }
+
   .stat-base-content {
     width: 100%;
     display: flex;
@@ -1180,17 +1217,30 @@
   <div class="tagline">Reggae · Akwa Ibom, Nigeria · Est. 2000</div>
 </div>
 
+<div class="quick-actions">
+  <div class="quick-label">Ask me about</div>
+  <div class="quick-btns">
+    <button class="quick-btn" onclick="sendQuick('Tell me about Archer Man')">🎤 About Archer Man</button>
+    <button class="quick-btn" onclick="sendQuick('Recommend a song for when I am feeling reflective and thoughtful')">🎭 Song for my mood</button>
+    <button class="quick-btn" onclick="sendQuick('Show me streaming statistics')">📊 Streaming Stats</button>
+    <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
+    <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
+    <button class="quick-btn" onclick="showReferral()">🎁 Refer &amp; Earn</button>
+    <button class="quick-btn" onclick="showPatron()">🎖️ Patron of Sparrow</button>
+    <button class="quick-btn" onclick="showUnreleasedTracks()">🔓 Unreleased Tracks</button>
+  </div>
+</div>
+
+<div style="display:flex; gap:8px; justify-content:center; padding:10px 0 4px;">
+  <button class="quick-btn" onclick="toggleNews(); document.getElementById('newsTracks').scrollIntoView({behavior:'smooth', block:'center'});">📰 Updates</button>
+  <button class="quick-btn" onclick="toggleComments(); document.getElementById('commentTracks').scrollIntoView({behavior:'smooth', block:'center'});">💬 Comments</button>
+</div>
+
 <div class="stats-bar">
   <div class="stats-inner" style="flex-direction:column; gap:14px; padding-bottom:14px;">
 
-    <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">
-      <a href="https://open.spotify.com/artist/5umBGZTUbaXAgJEUKDHZP2" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #3ddc6f 0%, #1a6b32 100%);">Spotify</a>
-      <a href="https://music.apple.com/ng/artist/archer-man/1812350770" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #ff8a9a 0%, #b5152a 100%);">Apple Music</a>
-      <a href="https://youtube.com/channel/UClpPzeXk32wAyZImXt0kfJQ?si=6xq_TtpDMgbLcW8B" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #e8c96a 0%, #6b4a1e 100%);">YouTube</a>
-      <a href="https://social.tunecore.com/linkShare?linkid=Gnn8G9XN2I-LI10u1Kf2ug" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #ffb45c 0%, #a35800 100%);">TuneCore</a>
-      <a href="https://amazon.com/music/player/artists/B0F84F95GR/archer-man?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_8S11lsC0DsnankZJjRxQbdQpG" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #5cd2ff 0%, #005f80 100%);">Amazon Music</a>
-      <a href="https://music.apple.com/us/artist/archer-man/1812350770" target="_blank" class="platform-pill-btn" style="background:linear-gradient(180deg, #d8b4fe 0%, #6b21a8 100%);">iTunes</a>
-    </div>
+    <div class="roster-caption">Artist on Sparrow</div>
+    <div class="roster-name">DJ Havock</div>
 
     <div class="stat-base"></div>
     <div class="stat-base-content">
@@ -1199,36 +1249,31 @@
   </div>
 </div>
 
-    
-
-  </div>
-</div>
-
-
-<div class="quick-actions">
-  <div class="quick-label">Ask me about</div>
-  <div class="quick-btns">
-    <button class="quick-btn" onclick="sendQuick('Tell me about Archer Man')">🎤 About Archer Man</button>
-    <button class="quick-btn" onclick="sendQuick('What is the story behind Them Are Plenty?')">🎵 Them Are Plenty</button>
-    <button class="quick-btn" onclick="sendQuick('Tell me the story behind Strange Love')">💛 Strange Love</button>
-    <button class="quick-btn" onclick="sendQuick('Recommend a song for when I am feeling reflective and thoughtful')">🎭 Song for my mood</button>
-    <button class="quick-btn" onclick="sendQuick('Show me streaming statistics')">📊 Streaming Stats</button>
-    <button class="quick-btn" onclick="sendQuick('What songs does Archer Man have?')">🎶 All Songs</button>
-    <button class="quick-btn" onclick="sendQuick('How many songs has Archer Man released so far?')">💿 Songs Released</button>
-    <button class="quick-btn" onclick="sendQuick('What are the upcoming songs from Archer Man?')">🔜 Upcoming</button>
-    <button class="quick-btn" onclick="showLeaderboard()">🏆 Fan of the Week</button>
-    <button class="quick-btn" onclick="showReferral()">🎁 Refer &amp; Earn</button>
-    <button class="quick-btn" onclick="showPatron()">🎖️ Patron of Sparrow</button>
-    <button class="quick-btn" onclick="showUnreleasedTracks()">🔓 Unreleased Tracks</button>
-    <button class="quick-btn" onclick="sendQuick('Tell me about the Creation Knowledge section')">📖 Creation Knowledge</button>
-    <button class="quick-btn" onclick="sendQuick('Any news or updates from Archer Man?')">📰 News &amp; Updates</button>
-    <button class="quick-btn" onclick="toggleComments(); document.getElementById('commentTracks').scrollIntoView({behavior:'smooth', block:'center'});">💬 Comments</button>
-  </div>
+<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; padding:12px 0 4px;">
+  <a href="https://open.spotify.com/artist/5umBGZTUbaXAgJEUKDHZP2" target="_blank" class="platform-icon-btn" style="background:#1DB954;" aria-label="Spotify">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#1DB954"/><path d="M6.5 9.5c3.5-1 8-0.6 10.8 1.1M7 13c3-0.8 6.6-0.5 9 0.9M7.5 16c2.5-0.6 5.3-0.4 7.3 0.7" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </a>
+  <a href="https://music.apple.com/ng/artist/archer-man/1812350770" target="_blank" class="platform-icon-btn" style="background:linear-gradient(180deg,#ff6b8a,#b5152a);" aria-label="Apple Music">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" fill="none"/><path d="M9 16.5V8.2l7-1.4v8.3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.7" cy="16.7" r="1.8" fill="#fff"/><circle cx="14.7" cy="15.1" r="1.8" fill="#fff"/></svg>
+  </a>
+  <a href="https://youtube.com/channel/UClpPzeXk32wAyZImXt0kfJQ?si=6xq_TtpDMgbLcW8B" target="_blank" class="platform-icon-btn" style="background:#FF0000;" aria-label="YouTube">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="4" fill="none"/><path d="M10 9.5l6 2.5-6 2.5z" fill="#fff"/></svg>
+  </a>
+  <a href="https://social.tunecore.com/linkShare?linkid=Gnn8G9XN2I-LI10u1Kf2ug" target="_blank" class="platform-icon-btn" style="background:linear-gradient(180deg,#ffb45c,#a35800);" aria-label="TuneCore">
+    <svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="16" r="2.3" fill="#fff"/><path d="M10.3 16V6.5L18 5v9.5" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="14.5" r="2" fill="#fff"/></svg>
+  </a>
+  <a href="https://amazon.com/music/player/artists/B0F84F95GR/archer-man?marketplaceId=ATVPDKIKX0DER&musicTerritory=US&ref=dm_sh_8S11lsC0DsnankZJjRxQbdQpG" target="_blank" class="platform-icon-btn" style="background:linear-gradient(180deg,#5cd2ff,#005f80);" aria-label="Amazon Music">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M5 16.5c4 2.3 10 2.3 14 0" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M16.5 16.2l2-0.4 0.3 1.9z" fill="#fff"/></svg>
+  </a>
+  <a href="https://music.apple.com/us/artist/archer-man/1812350770" target="_blank" class="platform-icon-btn" style="background:linear-gradient(180deg,#d8b4fe,#6b21a8);" aria-label="iTunes">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M9 16.5V8.2l7-1.4v8.3" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.7" cy="16.7" r="1.8" fill="#fff"/><circle cx="14.7" cy="15.1" r="1.8" fill="#fff"/></svg>
+  </a>
 </div>
 
 <div class="golden-divider"></div>
 
 <div class="listen-section">
+
   <div class="listen-header" onclick="toggleListen()">
     <div class="listen-title" style="flex:1; justify-content:center; text-align:center;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
