@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://archer-sparrow.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/YvUOq_tcEl4/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>Walking With The Lord — Archer Man</video:title>
+      <video:description>A spiritual, deeply philosophical reggae track from Archer Man. Walking With The Lord means living in accordance with His Laws — the only true way through life.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/YvUOq_tcEl4</video:player_loc>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/sMDJYWObClA/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>Rough Road — Archer Man</video:title>
+      <video:description>A reflective, resilient reggae track from Archer Man about staying true to your path no matter what anyone says.</video:description>
+      <video:player_loc>https://www.youtube.com/embed/sMDJYWObClA</video:player_loc>
+    </video:video>
   </url>
 </urlset>
