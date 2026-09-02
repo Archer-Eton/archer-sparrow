@@ -1524,6 +1524,8 @@
   </div>
   <div id="commentTracks" style="display:none; flex-direction:column; gap:14px; background:var(--dark3); border:1px solid rgba(74,222,128,0.15); border-top:none; border-radius:0 0 12px 12px; padding:16px;">
 
+    <div id="triviaBanner" style="display:none;"></div>
+
     <div style="display:flex; flex-direction:column; gap:8px;">
       <input id="commentNameInput" type="text" placeholder="Your name" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box;">
       <textarea id="commentTextInput" placeholder="Leave a comment for Archer Man..." rows="3" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box; resize:vertical;"></textarea>
@@ -1993,10 +1995,33 @@ function toggleComments() {
   chevron.classList.toggle('open', !isOpen);
   if (!isOpen) {
     loadComments();
+    loadTrivia();
     const savedName = getFanName();
     const nameInput = document.getElementById('commentNameInput');
     if (savedName && nameInput && !nameInput.value) nameInput.value = savedName;
   }
+}
+
+function loadTrivia() {
+  const banner = document.getElementById('triviaBanner');
+  if (!banner) return;
+  fetch('https://sparrow-backend-0mgf.onrender.com/trivia/current')
+    .then(r => r.json())
+    .then(data => {
+      if (data.active && data.question) {
+        banner.style.display = 'block';
+        banner.innerHTML = `
+          <div style="background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.35); border-radius:10px; padding:12px 14px;">
+            <div style="font-size:10px; letter-spacing:2px; color:#4ade80; text-transform:uppercase; margin-bottom:6px;">🎯 Trivia — First Correct Answer Wins</div>
+            <div style="font-size:13px; color:var(--text); margin-bottom:4px;">${escapeHtml(data.question)}</div>
+            <div style="font-size:11px; color:#86efac;">Prize: ${escapeHtml(data.prize || '')} — reply in the comments below!</div>
+          </div>`;
+      } else {
+        banner.style.display = 'none';
+        banner.innerHTML = '';
+      }
+    })
+    .catch(() => { banner.style.display = 'none'; });
 }
 
 function escapeHtml(str) {
@@ -2054,10 +2079,57 @@ function submitComment() {
       textInput.value = '';
       if (!nameInput.value.trim() && name) nameInput.value = name;
       loadComments();
+      loadTrivia();
+      if (data.trivia_won) {
+        showTriviaWin(name, data.prize);
+      }
     })
     .catch(() => {
       alert('Connection issue. Please try again.');
     });
+}
+
+function showTriviaWin(name, prize) {
+  const modal = document.getElementById('triviaWinModal');
+  const content = document.getElementById('triviaWinContent');
+  if (!modal || !content) return;
+  document.getElementById('triviaWinName').value = name;
+  content.innerHTML = `<div style="font-size:13px; color:var(--text); margin-bottom:14px;">You've won <strong style="color:#4ade80;">${escapeHtml(prize)}</strong>! Enter your phone number, town &amp; state, and preferred network below to claim it. Your town/state may be shared in our winner shoutout on social media.</div>`;
+  modal.style.display = 'flex';
+}
+
+function closeTriviaWin() {
+  document.getElementById('triviaWinModal').style.display = 'none';
+}
+
+function submitTriviaClaim() {
+  const name = document.getElementById('triviaWinName').value;
+  const phone = document.getElementById('triviaWinPhone').value.trim();
+  const location = document.getElementById('triviaWinLocation').value.trim();
+  const network = document.getElementById('triviaWinNetwork').value;
+
+  if (!phone) { alert('Please enter your phone number.'); return; }
+  if (!location) { alert('Please enter your town and state.'); return; }
+
+  fetch('https://sparrow-backend-0mgf.onrender.com/trivia/claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fan_id: getFanId(), name: name, phone: phone, network: network, location: location })
+  })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) { alert(data.detail || 'Could not submit your claim.'); return; }
+      if (data.dispensed && data.pin) {
+        document.getElementById('triviaWinContent').innerHTML = `
+          <div style="text-align:center; color:#86efac; font-size:13px; margin-bottom:10px;">🎉 Here's your ${network} recharge PIN:</div>
+          <div style="background:rgba(0,0,0,0.3); border:1px dashed #4ade80; border-radius:8px; padding:12px; text-align:center; font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:#fff; letter-spacing:1px;">${escapeHtml(data.pin)}</div>
+          <div style="font-size:10px; color:#7aaac8; text-align:center; margin-top:8px;">Save this — it won't be shown again.</div>`;
+      } else {
+        document.getElementById('triviaWinContent').innerHTML = `<div style="text-align:center; color:#86efac; font-size:13px;">🎉 Claim received! Your recharge card will be sent to this number shortly.</div>`;
+      }
+      document.getElementById('triviaClaimForm').style.display = 'none';
+    })
+    .catch(() => alert('Connection issue. Please try again.'));
 }
 
 const INTRO_LINKS = {
@@ -2626,6 +2698,26 @@ window.addEventListener('DOMContentLoaded', () => {
     <div style="font-size:10px; letter-spacing:2px; color:#7aaac8; text-transform:uppercase; margin-bottom:16px;">Fan of the Week &amp; Patron exclusive</div>
     <div id="unreleasedContent"></div>
     <button onclick="closeUnreleased()" style="background:transparent; color:#7aaac8; border:1px solid rgba(201,168,76,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
+  </div>
+</div>
+
+<!-- Trivia Win Modal -->
+<div id="triviaWinModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:1000; justify-content:center; align-items:center;">
+  <div style="background:#003153; border:2px solid #4ade80; border-radius:16px; padding:24px 20px; max-width:360px; width:90%; text-align:center; box-shadow:0 0 40px rgba(74,222,128,0.3); animation:msgIn 0.3s ease forwards;">
+    <div style="font-size:36px; margin-bottom:8px;">🎉</div>
+    <div style="font-family:'Playfair Display',serif; font-size:1.3rem; color:#4ade80; margin-bottom:10px; font-weight:700;">You Won the Trivia!</div>
+    <input type="hidden" id="triviaWinName">
+    <div id="triviaWinContent"></div>
+    <div id="triviaClaimForm" style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+      <input id="triviaWinPhone" type="tel" placeholder="Your phone number" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box;">
+      <input id="triviaWinLocation" type="text" placeholder="Your town &amp; state, e.g. Uyo, Akwa Ibom" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box;">
+      <select id="triviaWinNetwork" style="background:rgba(0,49,83,0.8); border:1px solid rgba(74,222,128,0.3); color:#f0f4ff; border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:12px; box-sizing:border-box;">
+        <option value="MTN">MTN</option>
+        <option value="Airtel">Airtel</option>
+      </select>
+      <button onclick="submitTriviaClaim()" style="background:linear-gradient(180deg, #4ade80 0%, #16a34a 100%); color:#052e0f; border:none; border-radius:100px; padding:10px 16px; font-family:'Space Mono',monospace; font-size:12px; font-weight:700; letter-spacing:1px; cursor:pointer;">Claim My Prize</button>
+    </div>
+    <button onclick="closeTriviaWin()" style="background:transparent; color:#7aaac8; border:1px solid rgba(74,222,128,0.2); border-radius:10px; padding:8px 24px; font-family:'Space Mono',monospace; font-size:11px; cursor:pointer; letter-spacing:1px; width:100%; margin-top:14px;">CLOSE</button>
   </div>
 </div>
 
