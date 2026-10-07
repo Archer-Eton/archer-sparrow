@@ -1369,7 +1369,7 @@
   </div>
   <div id="listenTracks" style="display:none; flex-direction:column; gap:6px; background:var(--dark3); border:1px solid rgba(201,168,76,0.12); border-top:none; border-radius:0 0 12px 12px; padding:12px 16px;">
 
-    <div class="platform-label">&#127925; Tap a title to preview</div>
+    <div class="platform-label">&#127925; Tap a title to listen — full songs, free</div>
 
     <div class="intro-row" data-song="Network" onclick="playIntro(this)">
       <span class="intro-play-icon">&#9658;</span>
@@ -1425,7 +1425,7 @@
     <audio id="introPlayer" preload="none"></audio>
 
     <div style="padding:14px 0 4px; text-align:center;">
-      <div style="font-size:12px; color:var(--gold-light); letter-spacing:1px;">&#8594; Go to Download for full songs</div>
+      <div style="font-size:12px; color:var(--gold-light); letter-spacing:1px;">&#8594; Go to Download to keep songs and listen offline</div>
     </div>
 
   </div>
@@ -2132,6 +2132,8 @@ function submitTriviaClaim() {
     .catch(() => alert('Connection issue. Please try again.'));
 }
 
+const LISTEN_BASE_URL = 'https://sparrow-backend-0mgf.onrender.com/listen';
+
 const INTRO_LINKS = {
   'Network': '/audio/network-intro.mp3',
   'Them Are Plenty': '/audio/them-are-plenty-intro.mp3',
@@ -2195,16 +2197,36 @@ function playIntro(rowEl) {
     stopCurrentIntro();
   }
 
-  player.src = url;
+  // Full-length song, streamed through the backend. `url` (the short clip) is
+  // kept only as a fallback if the stream can't be loaded.
+  player.src = LISTEN_BASE_URL + '?song=' + encodeURIComponent(song);
   player.play().catch(() => {});
   suppressMediaSession();
 
   rowEl.classList.add('playing');
-  rowEl.querySelector('.intro-play-icon').innerHTML = '&#10074;&#10074;';
+  // Show a loading dot until audio actually starts (the backend can take a
+  // moment to wake up), then switch to the pause icon.
+  rowEl.querySelector('.intro-play-icon').innerHTML = '&#8230;';
   rowEl.querySelector('.intro-wave').style.display = 'inline';
   if (waveIcon) waveIcon.style.display = 'inline';
   currentIntroRow = rowEl;
 
+  let triedFallback = false;
+  player.onplaying = () => {
+    if (currentIntroRow === rowEl) {
+      rowEl.querySelector('.intro-play-icon').innerHTML = '&#10074;&#10074;';
+    }
+  };
+  player.onerror = () => {
+    if (currentIntroRow !== rowEl) return;
+    if (!triedFallback) {
+      triedFallback = true;
+      player.src = url;
+      player.play().catch(() => {});
+    } else {
+      stopCurrentIntro();
+    }
+  };
   player.onended = () => {
     stopCurrentIntro();
   };
