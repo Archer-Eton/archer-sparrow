@@ -1256,6 +1256,46 @@
     background: rgba(201,168,76,0.18);
     border: 1px solid rgba(201,168,76,0.4);
   }
+  .seek-wrap {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 8px;
+    margin-top: -2px;
+    background: rgba(201,168,76,0.18);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+  }
+  .seek-wrap.show { display: flex; }
+  .seek-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text);
+    min-width: 34px;
+    text-align: center;
+  }
+  .seek-bar {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 5px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    background: linear-gradient(to right, var(--gold) var(--pct, 0%), rgba(255,255,255,0.25) var(--pct, 0%));
+  }
+  .seek-bar::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold); border: 2px solid #fff; cursor: pointer;
+  }
+  .seek-bar::-moz-range-thumb {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--gold); border: 2px solid #fff; cursor: pointer;
+  }
+  .intro-row.playing { border-radius: 8px 8px 0 0; }
+
   .intro-play-icon {
     font-size: 13px;
     color: var(--gold);
@@ -1422,6 +1462,11 @@
       <span class="intro-wave wave-bars" style="display:none;"><span></span><span></span><span></span><span></span></span>
     </div>
 
+    <div class="seek-wrap" id="seekWrap" onclick="event.stopPropagation()">
+      <span class="seek-time" id="seekCur">0:00</span>
+      <input type="range" class="seek-bar" id="seekBar" min="0" max="100" step="0.1" value="0" aria-label="Song progress">
+      <span class="seek-time" id="seekDur">0:00</span>
+    </div>
     <audio id="introPlayer" preload="none"></audio>
 
     <div style="padding:14px 0 4px; text-align:center;">
@@ -2147,6 +2192,57 @@ const INTRO_LINKS = {
   'Hand From Above': '/audio/hand-from-above-intro.mp3',
 };
 
+// ── Seek bar for Listen Now ─────────────────────────────────────────────────
+function fmtTime(t) {
+  if (!isFinite(t) || t < 0) return '0:00';
+  const m = Math.floor(t / 60), sec = Math.floor(t % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+let seekDragging = false;
+function updateSeekUI() {
+  const player = document.getElementById('introPlayer');
+  const bar = document.getElementById('seekBar');
+  if (!player || !bar) return;
+  const dur = player.duration;
+  const hasDur = isFinite(dur) && dur > 0;
+  document.getElementById('seekDur').textContent = hasDur ? fmtTime(dur) : '--:--';
+  if (!seekDragging) {
+    const pct = hasDur ? (player.currentTime / dur) * 100 : 0;
+    bar.value = pct;
+    bar.style.setProperty('--pct', pct + '%');
+    document.getElementById('seekCur').textContent = fmtTime(player.currentTime);
+  }
+}
+function showSeekBar(rowEl) {
+  const wrap = document.getElementById('seekWrap');
+  rowEl.insertAdjacentElement('afterend', wrap);
+  wrap.classList.add('show');
+  updateSeekUI();
+}
+function hideSeekBar() {
+  const wrap = document.getElementById('seekWrap');
+  if (wrap) wrap.classList.remove('show');
+}
+(function initSeekBar() {
+  const player = document.getElementById('introPlayer');
+  const bar = document.getElementById('seekBar');
+  if (!player || !bar) return;
+  ['timeupdate', 'durationchange', 'loadedmetadata', 'seeked'].forEach(ev => player.addEventListener(ev, updateSeekUI));
+  bar.addEventListener('input', () => {
+    seekDragging = true;
+    bar.style.setProperty('--pct', bar.value + '%');
+    if (isFinite(player.duration) && player.duration > 0) {
+      document.getElementById('seekCur').textContent = fmtTime(player.duration * bar.value / 100);
+    }
+  });
+  bar.addEventListener('change', () => {
+    if (isFinite(player.duration) && player.duration > 0) {
+      player.currentTime = player.duration * bar.value / 100;
+    }
+    seekDragging = false;
+  });
+})();
+
 let currentIntroRow = null;
 
 // Suppress the browser's automatic floating media mini-player / lock-screen
@@ -2176,6 +2272,7 @@ function stopCurrentIntro() {
   }
   const waveIcon = document.getElementById('listenWaveIcon');
   if (waveIcon) waveIcon.style.display = 'none';
+  hideSeekBar();
 }
 
 function playIntro(rowEl) {
@@ -2210,6 +2307,7 @@ function playIntro(rowEl) {
   rowEl.querySelector('.intro-wave').style.display = 'inline';
   if (waveIcon) waveIcon.style.display = 'inline';
   currentIntroRow = rowEl;
+  showSeekBar(rowEl);
 
   let triedFallback = false;
   player.onplaying = () => {
